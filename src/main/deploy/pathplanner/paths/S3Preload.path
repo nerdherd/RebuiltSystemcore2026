@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.2815000000000003,
+        "y": 4.078190476190477
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.949943708355575,
+        "y": 4.068025702516607
+      },
+      "isLocked": false,
+      "linkedName": "S3"
+    },
+    {
+      "anchor": {
+        "x": 2.922680901542112,
+        "y": 4.04
+      },
+      "prevControl": {
+        "x": 3.3312074838448953,
+        "y": 4.021039287563674
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "H0"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Flywheel Start 0",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Intake Down",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Combo Middle",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

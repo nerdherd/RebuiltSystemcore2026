@@ -1,7 +1,11 @@
 package first.robot.util;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
+import org.wpilib.hardware.discrete.DigitalInput;
+import org.wpilib.driverstation.DriverStationErrors;
+
+
+
+
 
 public class BannerSensor {
     private final DigitalInput bannerSensorBlack;
@@ -32,7 +36,7 @@ public class BannerSensor {
             detected = false;
         }
         else{
-            DriverStation.reportError("Fault in banner sensor, error code: ", true);
+            DriverStationErrors.reportWarning("Fault in banner sensor, error code: ", true);
             detected = false;
         }
         return detected;

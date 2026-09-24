@@ -1,59 +1,344 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package first.robot;
 
+import static first.robot.Constants.SwerveDriveConstants.kRobotOrientedVelocity;
+
+import dev.doglog.DogLog;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.networktables.StringSubscriber;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.hardware.power.PowerDistribution;
+import org.wpilib.hardware.power.PowerDistribution.ModuleType;
+import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry; 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandGamepad;
-import org.wpilib.command2.button.Trigger;
-import first.robot.Constants.OperatorConstants;
-import first.robot.commands.Autos;
-import first.robot.commands.ExampleCommand;
-import first.robot.subsystems.ExampleSubsystem;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Commands;
+import first.robot.Constants.ControllerConstants;
+import first.robot.Constants.ShooterConstants;
+import first.robot.Constants.Subsystems;
+import first.robot.Constants.ZoneConstants;
+import first.robot.Constants.SwerveDriveConstants.FieldPositions;
+import first.robot.commands.SwerveJoystickCommand;
+import first.robot.commands.autos.Autos;
+import first.robot.generated.TunerConstants;
+import first.robot.subsystems.NerdDrivetrain;
+import first.robot.subsystems.SuperSystem;
+import first.robot.util.controller.Controller;
+import first.robot.util.controller.Controller.Type;
+import first.robot.util.logging.NerdLog;
+import first.robot.util.logging.Reportable.LOG_LEVEL;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
+
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
+  public NerdDrivetrain swerveDrive;
+  public PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
+  
+  public SuperSystem superSystem;
 
-  private final CommandGamepad driverController =
-      new CommandGamepad(OperatorConstants.DRIVER_CONTROLLER_PORT);
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
-  }
-
+  private final Controller driverController = new Controller(ControllerConstants.kDriverControllerPort, Type.PS4);
+  private final Controller operatorController = new Controller(ControllerConstants.kOperatorControllerPort, Type.PS4);
+  private final Controller testController = new Controller(ControllerConstants.kTestControllerPort, Type.Xbox360);
+  
+  private static boolean isRedSide = false;
+  
   /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link org.wpilib.command2.button.CommandGenericHID}'s
-   * subclasses for {@link CommandGamepad Gamepad} gamepads or {@link
-   * org.wpilib.command2.button.CommandJoystick Flight joysticks}.
+   * The container for the robot. Contains
+   * subsystems, OI devices, and commands.
    */
-  private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(exampleSubsystem::exampleCondition).onTrue(new ExampleCommand(exampleSubsystem));
+  public RobotContainer() {
+    swerveDrive = TunerConstants.createDrivetrain();
 
-    // Schedule `exampleMethodCommand` when the Gamepad's right face button is pressed,
-    // cancelling on release.
-    driverController.faceRight().whileTrue(exampleSubsystem.exampleMethodCommand());
+    if (Constants.USE_SUBSYSTEMS) { // add subsystems
+      superSystem = new SuperSystem(swerveDrive);
+      superSystem.initializeLEDs();
+      Autos.initNamedCommands(superSystem, swerveDrive);
+    }
+    
+    Subsystems.init();
+    Autos.initAutoChooser();
+    initializeLogging();
+
+    NerdLog.get().reportInfo("Initialization Complete");
   }
 
+  public static void refreshAlliance() {
+    var alliance = DriverStation.getAlliance();
+    if (alliance.isPresent())
+      isRedSide = (alliance.get() == DriverStation.Alliance.Red);
+  }
+
+  public static boolean IsRedSide() {
+    return isRedSide;
+  }
+
+  public static double kOffset = 0.05;
+  /**
+   * Teleop commands configuration 
+   * used in teleop mode.
+   */
+  public void initDefaultCommands_teleop() {
+    SwerveJoystickCommand swerveJoystickCommand =
+    new SwerveJoystickCommand(
+      swerveDrive,
+      // Horizontal Translation
+      () -> -driverController.getLeftY(), 
+      // Vertical Translation
+      () -> -driverController.getLeftX(), 
+      // Turn
+      () -> -driverController.getRightX(), 
+      // use turn to angle
+      () -> driverController.getBumperRight(),
+      // turn to angle target direction, 0.0 to use manual
+      () -> swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset,
+      // robot oriented adjustment (dpad)
+      () -> new Translation2d(
+        (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
+        ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 1.5)
+        .rotateBy((!driverController.getBumperRight()) ? Rotation2d.kZero : 
+            Rotation2d.fromRadians(swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadRingDriveFactor) - swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) - kOffset)),
+      // joystick drive field oriented
+      () -> true, 
+      // tow supplier
+      () -> driverController.getBumperLeft(), 
+      // precision/programmer mode :)
+      () -> driverController.getTriggerLeftAxis()
+    );
+    
+    swerveDrive.setDefaultCommand(swerveJoystickCommand);
+  }
+
+  public void initDefaultCommands_test() {
+    swerveDrive.removeDefaultCommand();
+    // initDefaultCommands_teleop();
+  }
+
+  public void configureBindings_teleop() {
+    configureDriverBindings_teleop();
+    configureOperatorBindings_teleop();
+  }
+
+  ///////////////////////
+  // Driver bindings
+  //////////////////////
+  public void configureDriverBindings_teleop() {
+
+    driverController.controllerLeft() // Set Drive Heading
+      .onTrue(Commands.runOnce(() -> swerveDrive.setRobotHeadingForward()));
+
+    driverController.controllerRight() // Set Pose Heading (pressed)
+      .onTrue(Commands.runOnce(() -> swerveDrive.recalibrateGyroMT1()));
+
+    // driverController.triggerLeft().whileTrue(new RingDriveCommand( // Ring Drive (held)
+    //   swerveDrive,
+    //   () -> -driverController.getRightY(), // Horizontal Translation
+    //   () -> driverController.getLeftX() // Vertical Translation
+    // ));
+
+    if (Constants.USE_SUBSYSTEMS) {
+      driverController.triggerRight()
+        .onTrue(superSystem.intake())
+        .onFalse(superSystem.stopIntaking());
+
+      // driverController.buttonDown()
+      //   .whileTrue(superSystem.shootWithTuning())
+      //   .onFalse(superSystem.stopFlywheel());
+      // driverController.buttonUp()
+      //   .whileTrue(superSystem.shootWithDistance())
+      //   .onFalse(superSystem.stopFlywheel());
+      // driverController.buttonLeft()
+      //   .whileTrue(superSystem.shootWithCondition())
+      //   .onFalse(superSystem.stopShooting());
+
+      // driverController.bumperLeft()
+      //   .whileTrue(superSystem.climbUp())
+      //   .onFalse(superSystem.stopClimb());
+      // driverController.buttonRight()
+      //   .whileTrue(superSystem.climbDown())
+      //   .onFalse(superSystem.stopClimb());
+    }
+  }
+
+  ///////////////////////
+  // Operator bindings
+  //////////////////////
+  public void configureOperatorBindings_teleop() {
+
+    if (Constants.USE_SUBSYSTEMS) {
+      operatorController.controllerLeft()
+        .onTrue(superSystem.intakeHoldTeleop());
+        // .onFalse(superSystem.stopIntakeHold());
+      operatorController.controllerRight()
+        .onTrue(superSystem.intakeUp())
+        .onFalse(superSystem.stopIntakeHold());
+      operatorController.bumperLeft()
+        .onTrue(superSystem.intake())
+        .onFalse(superSystem.stopIntaking());
+
+      operatorController.triggerRight()
+        .whileTrue(superSystem.shootWithDistance())
+        // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
+        // .onTrue(superSystem.spinUpFlywheel())
+        .onFalse(superSystem.stopFlywheel());
+      operatorController.triggerLeft()
+        .onTrue(superSystem.spinUpFlywheel())
+        .onFalse(superSystem.stopFlywheel());
+      operatorController.bumperRight()
+        .whileTrue(superSystem.shootWithCondition())
+        .onFalse(superSystem.stopShooting());
+        
+      operatorController.buttonUp()
+        .whileTrue(superSystem.spinUpFlywheelFeeding())
+        .onFalse(superSystem.stopFlywheel());
+      operatorController.buttonRight()
+        .onTrue(superSystem.outtake())
+        .onFalse(superSystem.stopIntaking());
+      operatorController.buttonDown()
+        .onTrue(superSystem.reverseConveyor())
+        .onFalse(superSystem.stopConveyor());
+      // hood testing
+      operatorController.buttonLeft()
+        .onTrue(superSystem.setShooterCommand(45))
+        .onFalse(superSystem.stopFlywheel());
+
+      operatorController.dpadDown()
+        .onTrue(superSystem.setHood(0.5))
+        .onFalse(superSystem.hoodDown());
+      operatorController.dpadUp()
+        .onTrue(superSystem.hoodUp())
+        .onFalse(superSystem.hoodDown());
+     }
+  }
+
+  public void configureBindings_test() {
+
+    testController.buttonRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Right Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Right Test", "bye")));
+    testController.buttonDown()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Down Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Down Test", "bye")));
+    testController.buttonUp()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Up Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Up Test", "bye")));
+    testController.buttonLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Left Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Left Test", "bye")));
+
+    testController.bumperLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Bumper L Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Bumper L Test", "bye")));
+    testController.bumperRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Bumper R Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Bumper R Test", "bye")));
+    
+    testController.triggerLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Trigger L Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Trigger L Test", "bye")));
+    testController.triggerRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Trigger R Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Trigger R Test", "bye")));
+
+    testController.dpadUp()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Up Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Up Test", "bye")));
+    testController.dpadRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Right Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Right Test", "bye")));
+    testController.dpadDown()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Down Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Down Test", "bye")));
+    testController.dpadLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Left Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Left Test", "bye")));
+
+    testController.controllerLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Controller Left Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Controller Left Test", "bye")));
+    testController.controllerRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Controller Right Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Controller Right Test", "bye")));
+    
+    testController.joystickLeft()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Left Joy Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Left Joy Test", "bye")));
+    testController.joystickRight()
+      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Right Joy Test", "hi")))
+      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Right Joy Test", "bye")));
+
+  }
+  
+  public StringSubscriber printLog = null;
+  public void initializeLogging() {
+    if (printLog == null) printLog = DogLog.tunable("Print", "", (value) -> NerdLog.get().reportInfo("" + value));
+    NerdLog.get().logData("Robot/PDP", pdp, LOG_LEVEL.ALL);
+    
+    swerveDrive.initializeLogging();
+    if (Constants.USE_SUBSYSTEMS) { 
+      superSystem.initializeLogging();
+    }
+
+    NerdLog.get().logData("Robot/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.MEDIUM);
+    NerdLog.get().logNumber("Robot/RAM Usage", () -> (double)Runtime.getRuntime().freeMemory(), LOG_LEVEL.MEDIUM);
+    NerdLog.getNT().logNumber("Match Info/Shift Time", () -> {shiftTime = allianceShiftTime(); return shiftTime;}, LOG_LEVEL.MINIMAL);
+    NerdLog.getNT().logNumber("Robot/Battery Voltage", RobotController::getBatteryVoltage, LOG_LEVEL.MEDIUM);
+    NerdLog.getNT().logBoolean("Robot/Shooting Zone", () -> ZoneConstants.kShootingGroup.check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
+    NerdLog.getNT().logBoolean("Robot/Passing Zone", () -> ZoneConstants.kLongPass.get().check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
+    NerdLog.get().reportLogCount();
+    NerdLog.getNT().reportLogCount();
+  }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(exampleSubsystem);
+    return Autos.autoChooser.getSelected();
+  }
+
+  public void disableAllMotors_Test() {
+    swerveDrive.setBrake(true);
+  }
+
+  private static boolean gameEnded = false;
+  public static double shiftTime = 0.0;
+  /**
+   * Displays a countdown for alliance shifts. NOT 100% ACCURATE
+   * @return the number of seconds in the current phase, and the phase name
+   */
+  public static double allianceShiftTime() {
+    // if (!DriverStation.isFMSAttached()) { DogLog.forceNT.log("Match Info/Shift Name", "DriverStation not attached"); return 0.0; };
+    boolean wonAuto = true;
+    if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.MEDIUM) {
+      String data = DriverStation.getGameSpecificMessage();
+      if (!data.isEmpty()) switch (data.charAt(0)) {
+        case 'B': wonAuto = !isRedSide; break;
+        case 'R': wonAuto = isRedSide; break;
+        default: break;
+      } 
+      DogLog.forceNt.log("Match Info/Won Auto?", wonAuto);
+    }
+
+    double time = DriverStation.getMatchTime();
+    DogLog.forceNt.log("Match Info/time", time);
+
+    if (DriverStation.isAutonomous()) {
+      if (time < 0.0) { DogLog.forceNt.log("Match Info/Shift Name", (gameEnded) ? "Good Job Team!" : "Get Ready..."); return 0.0; }
+      DogLog.forceNt.log("Match Info/Shift Name", "Auto");
+      gameEnded = false;
+      return time;
+    } else if (DriverStation.isTeleop()) {
+      if (time < 0.0) { DogLog.forceNt.log("Match Info/Shift Name", (gameEnded) ? "Good Job Team!" : "Good Luck! -nerdherd"); return 0.0; }
+      else if (time >= 130.0) { DogLog.forceNt.log("Match Info/Shift Name", "Transition"); return time - 130; } // transition
+      else if (time >= 30.0) { 
+        int shift = (int)((130 - time) / 25) + 1; 
+        DogLog.forceNt.log("Match Info/Shift Name", "Shift " + shift + " " + (((shift % 2 == 1) == wonAuto) ? "Feeding" : "Scoring")); return (time - 30) % 25; 
+      } // shifts 1-4
+      else { DogLog.forceNt.log("Match Info/Shift Name", "Endgame"); if (time <= 1.0) gameEnded = true; return time; } // endgame
+    } else { DogLog.forceNt.log("Match Info/Shift Name", "Inactive"); return 0.0; }
   }
 }

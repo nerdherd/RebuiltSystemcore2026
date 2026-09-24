@@ -1,6 +1,6 @@
 package first.robot.util.Zones;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose2d;
 
 public class CircleZone implements NerdZone {
     

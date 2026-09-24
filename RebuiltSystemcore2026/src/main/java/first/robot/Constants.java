@@ -33,11 +33,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.util.FlippingUtil;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.Units;
+import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
 import first.robot.Constants.SwerveDriveConstants.FieldPositions;
 import first.robot.subsystems.LED;
 import first.robot.subsystems.template.TemplateSubsystem;
@@ -101,7 +101,7 @@ public final class Constants {
         y = NerdyMath.deadband(y, kTranslationDeadband);
         if (x == 0.0 && y == 0.0) {
           kTranslationInputRateLimiter.reset();
-          return Translation2d.kZero;
+          return Translation2d.ZERO;
         }
         Translation2d dir = new Translation2d(x, y);
         double length = dir.getNorm();
@@ -149,7 +149,7 @@ public final class Constants {
     ////////////////////////////////////////////
 
     /** Used for AutoBuilder configuration */
-    public static final SwerveRequest.ApplyRobotSpeeds  kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotSpeeds();
+    public static final SwerveRequest.ApplyRobotVelocity autoRequest = new SwerveRequest.ApplyRobotVelocity();
     /** Robot oriented controller */
     public static final SwerveRequest.RobotCentric      kRobotOrientedSwerveRequest = 
       new SwerveRequest.RobotCentric()
@@ -159,10 +159,9 @@ public final class Constants {
     /** Field oriented controller - use @see NerdDrivertrain#resetFieldOrientation() */
     public static final SwerveRequest.FieldCentric      kFieldOrientedSwerveRequest = 
       new SwerveRequest.FieldCentric()
-        .withDesaturateWheelSpeeds(true)
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
         .withSteerRequestType(SteerRequestType.Position)
-        .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+        .withForwardPerspective(SwerveRequest.ForwardPerspectiveValue.OperatorPerspective);
 
     /** Field oriented controller - use @see NerdDrivertrain#resetFieldOrientation() */
     public static final SwerveRequest.SwerveDriveBrake  kTowSwerveRequest = 
@@ -560,12 +559,12 @@ public final class Constants {
 
     private static final NerdZone kBlueTrench = 
       new RectangleZone(
-        new Pose2d(FieldPositions.HUB_CENTER.blue.getX() - (kTrenchWidth/2.0), -10, Rotation2d.kZero), 
-        new Pose2d(FieldPositions.HUB_CENTER.blue.getX() + (kTrenchWidth/2.0), 20, Rotation2d.kZero));
+        new Pose2d(FieldPositions.HUB_CENTER.blue.getX() - (kTrenchWidth/2.0), -10, Rotation2d.ZERO), 
+        new Pose2d(FieldPositions.HUB_CENTER.blue.getX() + (kTrenchWidth/2.0), 20, Rotation2d.ZERO));
     private static final NerdZone kRedTrench = 
       new RectangleZone(
-        new Pose2d(FieldPositions.HUB_CENTER.red.getX() - (kTrenchWidth/2.0), -10, Rotation2d.kZero), 
-        new Pose2d(FieldPositions.HUB_CENTER.red.getX() + (kTrenchWidth/2.0), 20, Rotation2d.kZero));
+        new Pose2d(FieldPositions.HUB_CENTER.red.getX() - (kTrenchWidth/2.0), -10, Rotation2d.ZERO), 
+        new Pose2d(FieldPositions.HUB_CENTER.red.getX() + (kTrenchWidth/2.0), 20, Rotation2d.ZERO));
 
     private static final NerdZone kBlueHub = new SemicircleZone(FieldPositions.HUB_CENTER.blue, ZoneConstants.kHubRadius);
     private static final NerdZone kRedHub = new SemicircleZone(FieldPositions.HUB_CENTER.red, ZoneConstants.kHubRadius);
@@ -578,8 +577,8 @@ public final class Constants {
     public static final NerdZone kLongPassBlue = 
       new ZoneGroup(
         new RectangleZone(
-          new Pose2d(8.27 + kDistFromCenterLongPass, -10, Rotation2d.kZero), 
-          new Pose2d(20, 20, Rotation2d.kZero))
+          new Pose2d(8.27 + kDistFromCenterLongPass, -10, Rotation2d.ZERO), 
+          new Pose2d(20, 20, Rotation2d.ZERO))
         )
         .excludeZone(kRedTrench)
         .excludeZone(kBlueTrench)
@@ -587,8 +586,8 @@ public final class Constants {
     public static final NerdZone kLongPassRed = 
       new ZoneGroup(
         new RectangleZone(
-          new Pose2d(8.27 - kDistFromCenterLongPass, -10, Rotation2d.kZero), 
-          new Pose2d(-10, 20, Rotation2d.kZero))
+          new Pose2d(8.27 - kDistFromCenterLongPass, -10, Rotation2d.ZERO), 
+          new Pose2d(-10, 20, Rotation2d.ZERO))
         )
         .excludeZone(kRedTrench)
         .excludeZone(kBlueTrench)

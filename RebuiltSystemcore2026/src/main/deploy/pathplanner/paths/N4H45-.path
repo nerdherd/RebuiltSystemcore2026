@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.054750000000001,
+        "y": 5.125559523809525
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.7821537089871626,
+        "y": 4.366144402554176
+      },
+      "isLocked": false,
+      "linkedName": "N4Up"
+    },
+    {
+      "anchor": {
+        "x": 3.076,
+        "y": 2.7042165242165255
+      },
+      "prevControl": {
+        "x": 5.7712068473609115,
+        "y": 2.7083534714347857
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "H45-"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.8827292110874134,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6590141796083719,
+      "maxWaypointRelativePos": 0.8561782579338288,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 45.0
+  },
+  "reversed": false,
+  "folder": "To Hub",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

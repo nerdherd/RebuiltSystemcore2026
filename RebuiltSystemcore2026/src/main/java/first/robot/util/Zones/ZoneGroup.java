@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose2d;
 
 public class ZoneGroup implements NerdZone {    
     private final List<NerdZone> zones = new ArrayList<NerdZone>();

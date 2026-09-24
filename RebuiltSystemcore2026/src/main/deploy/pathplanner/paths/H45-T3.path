@@ -1,0 +1,80 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.076,
+        "y": 2.7042165242165255
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.8796331120483374,
+        "y": 2.704216524216526
+      },
+      "isLocked": false,
+      "linkedName": "H45-"
+    },
+    {
+      "anchor": {
+        "x": 0.9,
+        "y": 2.92
+      },
+      "prevControl": {
+        "x": 0.9,
+        "y": 2.2270085046733006
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "T3"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.39735356675392663,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.5954130569306936,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.5,
+        "maxAcceleration": 1.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "Climb Up",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "To Tower",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 45.0
+  },
+  "useDefaultConstraints": true
+}

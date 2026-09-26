@@ -180,6 +180,7 @@ public class RobotContainer {
       operatorController.bumperLeft()
         .onTrue(superSystem.intake())
         .onFalse(superSystem.stopIntaking());
+      
 
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
@@ -194,7 +195,7 @@ public class RobotContainer {
         .onFalse(superSystem.stopShooting());
         
       operatorController.buttonUp()
-        .onTrue(superSystem.spinUpFlywheelFeeding())
+        .whileTrue(superSystem.spinUpFlywheelFeeding())
         .onFalse(superSystem.stopFlywheel());
       operatorController.buttonRight()
         .onTrue(superSystem.outtake())

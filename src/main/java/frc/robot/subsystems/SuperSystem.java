@@ -38,69 +38,17 @@ import frc.robot.util.nerd_logging.NerdLog;
 import frc.robot.util.nerd_logging.Reportable;
 
 public class SuperSystem implements Reportable {
-    public static final ArrayList<TemplateSubsystem> subsystems = new ArrayList<>();
-    public NerdDrivetrain swerveDrivetrain;
 
+    public static final ArrayList<TemplateSubsystem> subsystems = new ArrayList<>();
+
+    // ------------------------------------ drive ------------------------------------ //
+
+    public NerdDrivetrain swerveDrivetrain;
+    
     public SuperSystem(NerdDrivetrain swerveDrivetrain) {
         this.swerveDrivetrain = swerveDrivetrain;
     }
     
-    public static void registerSubsystem(TemplateSubsystem subsystem) {
-        subsystems.add(subsystem);
-    }
-    
-    public void applySubsystems(Consumer<TemplateSubsystem> f) {
-        for (TemplateSubsystem subsystem : subsystems) f.accept(subsystem);
-    }
-    
-    public Command setShooterCommand(double speed) {
-        return Commands.parallel(
-            shooter.setDesiredValueCommand(speed)
-            );
-    }
-
-    // ------------------------------------ subsystems ------------------------------------ //
-    public void reConfigureMotors() {
-        applySubsystems((s) -> s.applyMotorConfigs());
-    }
-    
-    public void startShoot() {
-        indexer.setDesiredValue(10);
-        conveyor.setDesiredValue(6);
-    }
-
-    public Command shoot() {
-        return Commands.parallel(
-            indexer.setDesiredValueCommand(10),
-            conveyor.setDesiredValueCommand(5)
-        );
-    }
-
-    private double startShootTime = 0.0;
-    public Command shootWithCondition() {
-        return Commands.run(() -> {
-            if (shooter.getCurrentVelocity() > 20.0) {
-                if (startShootTime < 0.0) startShootTime = MathSharedStore.getTimestamp();
-                startShoot();
-                double val = NerdyMath.posMod(MathSharedStore.getTimestamp() - startShootTime, 0.7);
-                if (val <= 0.5) intakeRoller.setDesiredValue(-2.0);
-                else if (val <= 0.7) intakeRoller.setDesiredValue(9);
-                else intakeRoller.setDesiredValue(0.0);
-            } else {
-                indexer.setDesiredValue(0);
-                conveyor.setDesiredValue(0);
-            }
-        }, indexer, conveyor)
-        .finallyDo(
-            () -> {
-                intakeRoller.setDesiredValue(0.0);
-                indexer.setDesiredValue(0);
-                conveyor.setDesiredValue(0);
-                startShootTime = -1.0;
-            }
-            );
-    }
-
     public Command autoTurnToHub = null;
     public Command turnToHub(double timeout) {
         if (autoTurnToHub == null) 
@@ -111,86 +59,30 @@ public class SuperSystem implements Reportable {
         return autoTurnToHub.raceWith(Commands.waitSeconds(timeout));
     }
 
-    public Command autoShoot = shootWithCondition();
-    public Command startShootWithCondition() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoShoot));
-    }
-    public Command stopShootWithCondition() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoShoot));
-    }
-
-    public Command autoShootWithDistance = autoShootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
-    public Command startShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoShootWithDistance));
-    }
-
-    public Command HoodShootWithDistance = shootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
-
-    public Command startHoodShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(HoodShootWithDistance));
-    }
+    // ------------------------------------ subsystems ------------------------------------ //
     
-    public Command stopShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoShootWithDistance));
-    }
-
-     public Command stopHoodShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(HoodShootWithDistance));
-    }
-
-    public Command reverseConveyor() {
+    // ------------------------------------ intake ------------------------------------ //
+    
+    public Command intake() {
         return Commands.parallel(
-            conveyor.setDesiredValueCommand(-5),
-            indexer.setDesiredValueCommand(-5)
-            );
-    }
-
-    public Command stopConveyor() {
-        return Commands.parallel(
-            conveyor.setDesiredValueCommand(0),
-            indexer.setDesiredValueCommand(0)
+            intakeRoller.setDesiredValueCommand(11),
+            intakeHoldTeleop()
             );
     }
     
-    public Command stopShooting() {
-        return Commands.parallel(
-            indexer.setDesiredValueCommand(0),
-            conveyor.setDesiredValueCommand(0)
-        );
-    }
-
-    public Command spinUpFlywheel() {
-        return Commands.parallel(
-            setShooterCommand(37)
-        );
-    }
-
-    public Command spinUpFlywheelFeeding() {
-        return Commands.run(() -> {
-            if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
-                shooter.setDesiredValue(65);
-                hood.setDesiredValue(Constants.HoodConstants.kUpPos);
-
-            } else {
-                shooter.setDesiredValue(45);
-                hood.setDesiredValue(Constants.HoodConstants.kDownPos);
-            }
-        });
-    }
-
-    public Command spinUpFlywheel(double speed) {
-        return Commands.parallel(
-            setShooterCommand(speed)
-        );
+    public Command outtake() {
+        return intakeRoller.setDesiredValueCommand(-9.5);
     }
         
-    public Command stopFlywheel() {
+    public Command stopIntaking() {
         return Commands.parallel(
-            setShooterCommand(0.0),
-            hoodDown()
+            intakeRoller.setDesiredValueCommand(0),
+            stopIntakeHold()
         );
     }
 
+    // ------------------------------------ intake pivot ------------------------------------ //
+    
     public Command intakeDown() {
         return Commands.sequence(
             intakeSlapdown.setDesiredValueCommand(-8),
@@ -219,24 +111,81 @@ public class SuperSystem implements Reportable {
         return intakeSlapdown.setDesiredValueCommand(1.5);
     }
 
-    public Command intake() {
+    // ------------------------------------ conveyor ------------------------------------ //
+   
+    public Command reverseConveyor() {
         return Commands.parallel(
-            intakeRoller.setDesiredValueCommand(11),
-            intakeHoldTeleop()
+            conveyor.setDesiredValueCommand(-5),
+            indexer.setDesiredValueCommand(-5)
             );
     }
-    
-    public Command outtake() {
-        return intakeRoller.setDesiredValueCommand(-9.5);
-    }
-        
-    public Command stopIntaking() {
+
+    public Command stopConveyor() {
         return Commands.parallel(
-            intakeRoller.setDesiredValueCommand(0),
-            stopIntakeHold()
-        );
+            conveyor.setDesiredValueCommand(0),
+            indexer.setDesiredValueCommand(0)
+            );
     }
 
+    public void startShoot() {
+        indexer.setDesiredValue(10);
+        conveyor.setDesiredValue(6);
+    }
+
+    public Command shoot() {
+        return Commands.parallel(
+            indexer.setDesiredValueCommand(10),
+            conveyor.setDesiredValueCommand(5)
+        );
+    }
+    
+    // ------------------------------------ shooter ------------------------------------ //
+    
+    private double startShootTime = 0.0;
+    
+    public Command shootWithCondition() {
+        return Commands.run(() -> {
+            if (shooter.getCurrentVelocity() > 20.0) {
+                if (startShootTime < 0.0) startShootTime = MathSharedStore.getTimestamp();
+                startShoot();
+                double val = NerdyMath.posMod(MathSharedStore.getTimestamp() - startShootTime, 0.7);
+                if (val <= 0.5) intakeRoller.setDesiredValue(-2.0);
+                else if (val <= 0.7) intakeRoller.setDesiredValue(9);
+                else intakeRoller.setDesiredValue(0.0);
+            } else {
+                indexer.setDesiredValue(0);
+                conveyor.setDesiredValue(0);
+            }
+        }, indexer, conveyor)
+        .finallyDo(
+            () -> {
+                intakeRoller.setDesiredValue(0.0);
+                indexer.setDesiredValue(0);
+                conveyor.setDesiredValue(0);
+                startShootTime = -1.0;
+            }
+            );
+    }
+
+    public Command autoShoot = shootWithCondition();
+    
+    public Command startShootWithCondition() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoShoot));
+    }
+    public Command stopShootWithCondition() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoShoot));
+    }
+
+    public Command autoShootWithDistance = autoShootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
+    
+    public Command startShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoShootWithDistance));
+    }
+
+    public Command stopShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoShootWithDistance));
+    }
+    
     public Command autoShootWithDistance() {
         return Commands.run(
             () -> {
@@ -272,12 +221,14 @@ public class SuperSystem implements Reportable {
     }
 
     public double shootSpeed = 0;
+   
     public DoubleSubscriber shootSpeedSub = null;
     /**
      * change shootSpeed using elastic, always defaults to 0 when 
      * the code is reloaded so save the value
      * @return
      */
+   
     public Command shootWithTuning() {
         if (shootSpeedSub == null) shootSpeedSub = DogLog.tunable("Shooter Speed", shootSpeed, (value) -> shootSpeed = value);
 
@@ -287,11 +238,60 @@ public class SuperSystem implements Reportable {
             else hood.setDesiredValue(HoodConstants.kDownPos);
         }, shooter);
     }
+    
+    public Command setShooterCommand(double speed) {
+        return Commands.parallel(
+            shooter.setDesiredValueCommand(speed)
+            );
+    }
 
+    public Command stopShooting() {
+        return Commands.parallel(
+            indexer.setDesiredValueCommand(0),
+            conveyor.setDesiredValueCommand(0)
+        );
+    }
+
+    // ------------------------------------ flywheel ------------------------------------ //
+   
+    public Command spinUpFlywheel() {
+        return Commands.parallel(
+            setShooterCommand(37)
+        );
+    }
+
+    public Command spinUpFlywheelFeeding() {
+        return Commands.run(() -> {
+            if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
+                shooter.setDesiredValue(65);
+                hood.setDesiredValue(Constants.HoodConstants.kUpPos);
+
+            } else {
+                shooter.setDesiredValue(45);
+                hood.setDesiredValue(Constants.HoodConstants.kDownPos);
+            }
+        });
+    }
+
+    public Command spinUpFlywheel(double speed) {
+        return Commands.parallel(
+            setShooterCommand(speed)
+        );
+    }
+        
+    public Command stopFlywheel() {
+        return Commands.parallel(
+            setShooterCommand(0.0),
+            hoodDown()
+        );
+    }
+    // ------------------------------------ hood ------------------------------------ //
+    
     // hood is 18:1
     /** set the shooter's hood's position
      * @param value between 1 and 0, where 1 is up and 0 is down
     */
+   
     public Command setHood(double value) {
         value = (HoodConstants.kUpPos-HoodConstants.kDownPos) * value + HoodConstants.kDownPos;
         return hood.setDesiredValueCommand(value);
@@ -309,16 +309,41 @@ public class SuperSystem implements Reportable {
         return !Constants.ZoneConstants.kShootingGroup.check(swerveDrivetrain.getPose()); 
     }
 
+    public Command HoodShootWithDistance = shootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
+
+    public Command startHoodShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(HoodShootWithDistance));
+    }
+
+    public Command stopHoodShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(HoodShootWithDistance));
+    }
+
+    // ------------------------------------ helper functions ------------------------------------ //
+
+    public static void registerSubsystem(TemplateSubsystem subsystem) {
+        subsystems.add(subsystem);
+    }
+    
+    public void applySubsystems(Consumer<TemplateSubsystem> f) {
+        for (TemplateSubsystem subsystem : subsystems) f.accept(subsystem);
+    }
+    
+    public void reConfigureMotors() {
+        applySubsystems((s) -> s.applyMotorConfigs());
+    }
+
     public void setNeutralMode(NeutralModeValue neutralMode) {
         applySubsystems((s) -> s.setNeutralMode(neutralMode));
     }
-
+    
     /**
      * fully stops all subsystems by putting them into neutral and disabling them
      * subsystems do not reenable on their own
      * @return a command to stop
      */
-    public Command stop() {
+    
+    public Command stopCommand() {
         return Commands.runOnce(() -> {
             applySubsystems((s) -> s.stop());
         });
@@ -347,6 +372,7 @@ public class SuperSystem implements Reportable {
     }
 
     // ------------------------------------ logging ------------------------------------ //
+    
     @Override
     public void initializeLogging() {
         applySubsystems((s) -> s.initializeLogging());

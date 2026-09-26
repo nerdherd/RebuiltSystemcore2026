@@ -3,6 +3,8 @@ package frc.robot.generated;
 
 import static org.wpilib.units.Units.*;
 
+import org.wpilib.hardware.bus.CANPort;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.*;
@@ -78,7 +80,7 @@ public class TunerConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus kCANBus = new CANBus("can_s0"); //TODO test
+    public static final CANBus kCANBus = new CANBus(CANPort.CAN_S0); //TODO test
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot

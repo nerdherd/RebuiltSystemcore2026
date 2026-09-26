@@ -17,6 +17,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 
+import dev.doglog.DogLog;
+
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.geometry.Pose2d;
@@ -84,7 +86,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
     @Override
     public void periodic() {
         field.setRobotPose(getPose());
-
+        DogLog.log("pose", getPose());
         if (USE_VISION) {
             // visionUpdate(Camera.Example);
             visionUpdate(Camera.Front, true);
@@ -354,7 +356,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
             NerdLog.logBoolean(kSwerveTab + "/" + camera.name + " detecting", () -> LimelightHelpers.getTV(camera.name), LOG_LEVEL.ALL);
 
         NerdLog.logStructSerializable(kSwerveTab + "/Field Chassis Speeds", () -> getFieldOrientedVelocities(), LOG_LEVEL.ALL);
-        NerdLog.logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.ALL);
+        NerdLog.logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.MEDIUM);
 
         //////////////
         /// MEDIUM ///

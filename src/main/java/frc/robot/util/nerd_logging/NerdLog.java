@@ -229,7 +229,11 @@ public class NerdLog {
 	 */
 	public static void logData(String path, TelemetryLoggable supplier, LOG_LEVEL loggingLevel) {
 		if(Constants.ROBOT_LOG_LEVEL.ordinal() > loggingLevel.ordinal()) return;
-		Telemetry.log(path, supplier);
+		if (!logSuppliers.containsKey(loggingLevel)) logSuppliers.put(loggingLevel, new ArrayList<>());
+
+		Runnable logger = 
+			() -> {Telemetry.log(path, supplier);};
+		logSuppliers.get(loggingLevel).add(logger);
 	}
 
 	/**
@@ -256,7 +260,11 @@ public class NerdLog {
 	 */
 	public static void logSwerveModules(String path, Supplier<SwerveDriveState> supplier, LOG_LEVEL loggingLevel) {
 		if(Constants.ROBOT_LOG_LEVEL.ordinal() > loggingLevel.ordinal()) return;
-		Telemetry.log(path, generateModuleSendable(supplier));
+		if (!logSuppliers.containsKey(loggingLevel)) logSuppliers.put(loggingLevel, new ArrayList<>());
+
+		Runnable logger = 
+			() -> {Telemetry.log(path, generateModuleSendable(supplier));};
+		logSuppliers.get(loggingLevel).add(logger);
 	}
 
 	private static TelemetryLoggable generateModuleSendable(Supplier<SwerveDriveState> state) {

@@ -15,6 +15,7 @@ import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.system.RobotController;
 import org.wpilib.hardware.power.PowerDistribution.ModuleType;
@@ -33,22 +34,19 @@ import frc.robot.commands.autos.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.subsystems.SuperSystem;
-import frc.robot.util.controller.Controller;
-import frc.robot.util.controller.Controller.Type;
-import frc.robot.util.logging.NerdLog;
-import frc.robot.util.logging.Reportable.LOG_LEVEL;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Tunables;
+import frc.robot.util.nerd_controller.Controller;
+import frc.robot.util.nerd_logging.NerdLog;
+import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 
 public class RobotContainer {
   public NerdDrivetrain swerveDrive;
-  public PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
+  public PowerDistribution pdp = new PowerDistribution(CANPort.CAN_D0, 1, ModuleType.REV);
   
   public SuperSystem superSystem;
 
-  private final Controller driverController = new Controller(ControllerConstants.kDriverControllerPort, Type.PS4);
-  private final Controller operatorController = new Controller(ControllerConstants.kOperatorControllerPort, Type.PS4);
-  private final Controller testController = new Controller(ControllerConstants.kTestControllerPort, Type.Xbox360);
+  private final Controller driverController = new Controller(ControllerConstants.kDriverControllerPort);
+  private final Controller operatorController = new Controller(ControllerConstants.kOperatorControllerPort);
+  private final Controller testController = new Controller(ControllerConstants.kTestControllerPort);
   
   private static boolean isRedSide = false;
   
@@ -59,17 +57,17 @@ public class RobotContainer {
   public RobotContainer() {
     swerveDrive = TunerConstants.createDrivetrain();
 
-    if (Constants.USE_SUBSYSTEMS) { // add subsystems
-      superSystem = new SuperSystem(swerveDrive);
-      superSystem.initializeLEDs();
-      Autos.initNamedCommands(superSystem, swerveDrive);
-    }
+    // if (Constants.USE_SUBSYSTEMS) { // add subsystems
+    //   superSystem = new SuperSystem(swerveDrive);
+    //   superSystem.initializeLEDs();
+    //   Autos.initNamedCommands(superSystem, swerveDrive);
+    // }
     
-    Subsystems.init();
-    Autos.initAutoChooser();
-    initializeLogging();
+    // Subsystems.init();
+    // Autos.initAutoChooser();
+    // initializeLogging();
 
-    NerdLog.get().reportInfo("Initialization Complete");
+    // NerdLog.reportInfo("Initialization Complete");
   }
 
   public static void refreshAlliance() {
@@ -105,7 +103,7 @@ public class RobotContainer {
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
         ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 1.5)
-        .rotateBy((!driverController.getBumperRight()) ? Rotation2d.kZero : 
+        .rotateBy((!driverController.getBumperRight()) ? Rotation2d.ZERO : 
             Rotation2d.fromRadians(swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadRingDriveFactor) - swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) - kOffset)),
       // joystick drive field oriented
       () -> true, 
@@ -280,22 +278,22 @@ public class RobotContainer {
   
   public StringSubscriber printLog = null;
   public void initializeLogging() {
-    if (printLog == null) printLog = DogLog.tunable("Print", "", (value) -> NerdLog.get().reportInfo("" + value));
-    NerdLog.get().logData("Robot/PDP", pdp, LOG_LEVEL.ALL);
+    if (printLog == null) printLog = DogLog.tunable("Print", "", (value) -> NerdLog.reportInfo("" + value));
+    NerdLog.logData("Robot/PDP", pdp, LOG_LEVEL.ALL);
     
     swerveDrive.initializeLogging();
     if (Constants.USE_SUBSYSTEMS) { 
       superSystem.initializeLogging();
     }
 
-    NerdLog.get().logData("Robot/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.MEDIUM);
-    NerdLog.get().logNumber("Robot/RAM Usage", () -> (double)Runtime.getRuntime().freeMemory(), LOG_LEVEL.MEDIUM);
-    NerdLog.getNT().logNumber("Match Info/Shift Time", () -> {shiftTime = allianceShiftTime(); return shiftTime;}, LOG_LEVEL.MINIMAL);
-    NerdLog.getNT().logNumber("Robot/Battery Voltage", RobotController::getBatteryVoltage, LOG_LEVEL.MEDIUM);
-    NerdLog.getNT().logBoolean("Robot/Shooting Zone", () -> ZoneConstants.kShootingGroup.check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
-    NerdLog.getNT().logBoolean("Robot/Passing Zone", () -> ZoneConstants.kLongPass.get().check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
-    NerdLog.get().reportLogCount();
-    NerdLog.getNT().reportLogCount();
+    NerdLog.logData("Robot/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.MEDIUM);
+    NerdLog.logNumber("Robot/RAM Usage", () -> (double)Runtime.getRuntime().freeMemory(), LOG_LEVEL.MEDIUM);
+    NerdLog.logNumber("Match Info/Shift Time", () -> {shiftTime = allianceShiftTime(); return shiftTime;}, LOG_LEVEL.MINIMAL);
+    NerdLog.logNumber("Robot/Battery Voltage", RobotController::getBatteryVoltage, LOG_LEVEL.MEDIUM);
+    NerdLog.logBoolean("Robot/Shooting Zone", () -> ZoneConstants.kShootingGroup.check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
+    NerdLog.logBoolean("Robot/Passing Zone", () -> ZoneConstants.kLongPass.get().check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
+    NerdLog.reportLogCount();
+    NerdLog.reportLogCount();
   }
   
   /**

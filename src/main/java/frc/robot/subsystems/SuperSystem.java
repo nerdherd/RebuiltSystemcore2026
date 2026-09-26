@@ -20,10 +20,6 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.networktables.DoubleSubscriber;
 import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.driverstation.MatchType;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
@@ -37,9 +33,9 @@ import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
 import frc.robot.commands.RebuiltLEDCommand;
 import frc.robot.commands.SwerveJoystickCommand;
 import frc.robot.subsystems.template.TemplateSubsystem;
-import frc.robot.util.NerdyMath;
-import frc.robot.util.logging.NerdLog;
-import frc.robot.util.logging.Reportable;
+import frc.robot.util.nerd_math.NerdyMath;
+import frc.robot.util.nerd_logging.NerdLog;
+import frc.robot.util.nerd_logging.Reportable;
 
 public class SuperSystem implements Reportable {
     public static final ArrayList<TemplateSubsystem> subsystems = new ArrayList<>();
@@ -110,7 +106,7 @@ public class SuperSystem implements Reportable {
         if (autoTurnToHub == null) 
             autoTurnToHub = new SwerveJoystickCommand(swerveDrivetrain, () -> 0.0, () -> 0.0, () -> 0.0, () -> true, 
                 () -> swerveDrivetrain.angleToPose(FieldPositions.HUB_CENTER) + RobotContainer.kOffset, 
-                () -> Translation2d.kZero, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0));
+                () -> Translation2d.ZERO, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0));
 
         return autoTurnToHub.raceWith(Commands.waitSeconds(timeout));
     }
@@ -355,8 +351,8 @@ public class SuperSystem implements Reportable {
     public void initializeLogging() {
         applySubsystems((s) -> s.initializeLogging());
 
-        NerdLog.getNT().logNumber(kSupersystemTab + "/Hub Distance", () -> getHubDistance(), "m", LOG_LEVEL.MEDIUM);
-        NerdLog.get().logData(kSupersystemTab + "/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.ALL);
-        NerdLog.getNT().logBoolean(kSupersystemTab + "/useShootHood", () -> useHoodShoot() , LOG_LEVEL.MEDIUM);
+        NerdLog.logNumber(kSupersystemTab + "/Hub Distance", () -> getHubDistance(), "m", LOG_LEVEL.MEDIUM);
+        NerdLog.logData(kSupersystemTab + "/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.ALL);
+        NerdLog.logBoolean(kSupersystemTab + "/useShootHood", () -> useHoodShoot() , LOG_LEVEL.MEDIUM);
     }
 }

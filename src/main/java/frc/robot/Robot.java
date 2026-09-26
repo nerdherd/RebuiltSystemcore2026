@@ -9,12 +9,13 @@ import static frc.robot.Constants.USE_VISION;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
+import frc.robot.util.nerd_logging.NerdLog;
+
 import org.wpilib.system.RobotController;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
-import frc.robot.util.logging.NerdLog;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -42,7 +43,7 @@ public class Robot extends TimedRobot {
       .withNtTunables(true)
     );
     DogLog.setEnabled(true);
-    RobotController.setBrownoutVoltage(RobotController.getBatteryVoltage());
+    RobotController.setBrownoutVoltages(6.0,6.0);
   }
 
   /**
@@ -59,8 +60,8 @@ public class Robot extends TimedRobot {
     DogLog.timeEnd("Periodic/CommandScheduler Runtime");
     
     DogLog.time("Periodic/NerdLog Runtime");
-    NerdLog.get().periodic();
-    NerdLog.getNT().periodic();
+    NerdLog.periodic();
+    NerdLog.periodic();
     DogLog.timeEnd("Periodic/NerdLog Runtime");
   }
 
@@ -71,7 +72,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
     
     if (Constants.USE_SUBSYSTEMS){
-      m_robotContainer.superSystem.stop();
       m_robotContainer.superSystem.resetSubsystemValues();
       m_robotContainer.superSystem.reConfigureMotors();
     }

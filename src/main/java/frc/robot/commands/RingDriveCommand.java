@@ -13,7 +13,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.command2.Command;
 import frc.robot.Constants.RingDriveConstants;
 import frc.robot.subsystems.NerdDrivetrain;
-import frc.robot.util.NerdyMath;
+import frc.robot.util.nerd_math.NerdyMath;
 
 public class RingDriveCommand extends Command {
   private final NerdDrivetrain swerveDrive;

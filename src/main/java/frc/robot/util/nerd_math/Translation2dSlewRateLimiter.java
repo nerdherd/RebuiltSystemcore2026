@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.nerd_math;
 
 import org.wpilib.math.util.MathSharedStore;
 import org.wpilib.math.geometry.Translation2d;

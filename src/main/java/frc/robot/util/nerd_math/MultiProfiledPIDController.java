@@ -2,15 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.util;
+package frc.robot.util.nerd_math;
 
 import java.util.HashMap;
 
-import com.pathplanner.lib.config.PIDConstants;
-
 import org.wpilib.math.controller.ProfiledPIDController;
 import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
-import frc.robot.util.logging.NerdLog;
+
+import frc.robot.util.nerd_constants.PIDVSAGConstants;
+import frc.robot.util.nerd_logging.NerdLog;
 
 /**
  * i didn't like the current implementation of the PID controller
@@ -18,8 +18,8 @@ import frc.robot.util.logging.NerdLog;
 public class MultiProfiledPIDController {
     private final HashMap<String, ProfiledPIDController> controllers = new HashMap<>();
 
-    public MultiProfiledPIDController add(String name, PIDConstants pidConstants, Constraints profileConstraints, double errorTolerance, double derivativeTolerance) {
-        ProfiledPIDController controller = new ProfiledPIDController(pidConstants.kP, pidConstants.kI, pidConstants.kD, profileConstraints);
+    public MultiProfiledPIDController add(String name, PIDVSAGConstants pidConstants, Constraints profileConstraints, double errorTolerance, double derivativeTolerance) {
+        ProfiledPIDController controller = new ProfiledPIDController(pidConstants.kP(), pidConstants.kI(), pidConstants.kD(), profileConstraints);
         controller.setTolerance(errorTolerance, derivativeTolerance);
         controllers.put(name, controller);
         return this;
@@ -89,7 +89,7 @@ public class MultiProfiledPIDController {
 
     private boolean checkName(String name) {
         if (!controllers.containsKey(name)) {
-            NerdLog.get().reportError("MultiProfiledPIDController: " + name + " is not a valid entry!");
+            NerdLog.reportError("MultiProfiledPIDController: " + name + " is not a valid entry!");
             return false;
         }
         return true;

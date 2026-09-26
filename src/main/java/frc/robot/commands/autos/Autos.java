@@ -1,108 +1,104 @@
 package frc.robot.commands.autos;
 
-import org.wpilib.smartdashboard.SendableChooser;
+import org.wpilib.tunable.Selectable;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.subsystems.SuperSystem;
-import frc.robot.util.logging.NerdLog;
-import frc.robot.util.logging.Reportable.LOG_LEVEL;
 
 import static frc.robot.Constants.LoggingConstants.kAutosTab;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 public final class Autos {
-    public static SendableChooser<Command> autoChooser = new SendableChooser<>();
+    public static Selectable<Command> autoChooser = new Selectable<>();
 
-    public static void initAutoChooser() {
-        autoChooser.setDefaultOption("Do Nothing", Commands.none());
+    // public static void initAutoChooser() {
+    //     autoChooser.setDefaultOption("Do Nothing", Commands.none());
         
-        // autoChooser.addOption("Test", AutoBuilder.buildAuto("test"));
+    //     // autoChooser.addOption("Test", AutoBuilder.buildAuto("test"));
 
-        // EXAMPLE
-        // autoChooser.addOption("Auto Name", AutoBuilder.buildAuto("PathPlanner Auto Name"));
+    //     // EXAMPLE
+    //     // autoChooser.addOption("Auto Name", AutoBuilder.buildAuto("PathPlanner Auto Name"));
 
-        // TOP
-        // autoChooser.addOption("Top-S1Neutral2.5", AutoBuilder.buildAuto("Top-S1Neutral2.5"));
-        autoChooser.addOption("Top-S1Neutral2.5 w Distance", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Distance"));
-        autoChooser.addOption("trench", AutoBuilder.buildAuto("trench"));
+    //     // TOP
+    //     // autoChooser.addOption("Top-S1Neutral2.5", AutoBuilder.buildAuto("Top-S1Neutral2.5"));
+    //     autoChooser.addOption("Top-S1Neutral2.5 w Distance", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Distance"));
+    //     autoChooser.addOption("trench", AutoBuilder.buildAuto("trench"));
 
-        // autoChooser.addOption("Top-S1Neutral3", AutoBuilder.buildAuto("Top-S1Neutral3"));
-        // autoChooser.addOption("Top-S1MidDepot", AutoBuilder.buildAuto("Top-S1MidDepot"));
+    //     // autoChooser.addOption("Top-S1Neutral3", AutoBuilder.buildAuto("Top-S1Neutral3"));
+    //     // autoChooser.addOption("Top-S1MidDepot", AutoBuilder.buildAuto("Top-S1MidDepot"));
 
-        // MID
-        // autoChooser.addOption("Mid-S3DepotTower", AutoBuilder.buildAuto("Mid-S3DepotTower"));
-        // autoChooser.addOption("Mid-S3DepotTower2", AutoBuilder.buildAuto("Mid-S3DepotTower2"));
-
-
-        // BOT
-        // autoChooser.addOption("Bot-S5Neutral2.5", AutoBuilder.buildAuto("Bot-S5Neutral2.5"));
-        autoChooser.addOption("Bot-S5Neutral2.5 w Distance", AutoBuilder.buildAuto("Bot-S5Neutral2.5 w Distance"));
+    //     // MID
+    //     // autoChooser.addOption("Mid-S3DepotTower", AutoBuilder.buildAuto("Mid-S3DepotTower"));
+    //     // autoChooser.addOption("Mid-S3DepotTower2", AutoBuilder.buildAuto("Mid-S3DepotTower2"));
 
 
-        // TEST
-        // autoChooser.addOption("Top-S1Trench2.5", AutoBuilder.buildAuto("Top-S1Trench2.5"));
-        // autoChooser.addOption("Bot-S5Trench2.5", AutoBuilder.buildAuto("Bot-S5Trench2.5"));
+    //     // BOT
+    //     // autoChooser.addOption("Bot-S5Neutral2.5", AutoBuilder.buildAuto("Bot-S5Neutral2.5"));
+    //     autoChooser.addOption("Bot-S5Neutral2.5 w Distance", AutoBuilder.buildAuto("Bot-S5Neutral2.5 w Distance"));
 
-        NerdLog.get().logData(kAutosTab + "/Selected Auto", autoChooser, LOG_LEVEL.MINIMAL);
-    }
 
-    public static void initNamedCommands(SuperSystem superSystem, NerdDrivetrain swerveDrive) {
-        // SWERVE2
-        NamedCommands.registerCommand("Reset Pose", swerveDrive.resetPoseWithAprilTags(0.2));
+    //     // TEST
+    //     // autoChooser.addOption("Top-S1Trench2.5", AutoBuilder.buildAuto("Top-S1Trench2.5"));
+    //     // autoChooser.addOption("Bot-S5Trench2.5", AutoBuilder.buildAuto("Bot-S5Trench2.5"));
 
-        // INTAKE
-        NamedCommands.registerCommand("Intake Down", superSystem.intakeDown());
-        NamedCommands.registerCommand("Intake Down Only", superSystem.intakeDownOnly());
-        NamedCommands.registerCommand("Intake Hold", superSystem.intakeHold());
-        // NamedCommands.registerCommand("Intake Up", superSystem.intakeUp());
-        NamedCommands.registerCommand("Intake Start", superSystem.intake());
-        NamedCommands.registerCommand("Intake Stop", superSystem.stopIntaking());
-        NamedCommands.registerCommand("Intake Hold Stop", superSystem.stopIntakeHold());
+    //     NerdLog.get().logData(kAutosTab + "/Selected Auto", autoChooser, LOG_LEVEL.MINIMAL);
+    // }
 
-        NamedCommands.registerCommand("Intake Down Sequence", 
-            Commands.sequence(
-                superSystem.intakeDown(),
-                superSystem.intake()
-            ));
-        NamedCommands.registerCommand("Auto Shoot Start", superSystem.startShootWithCondition());
-        NamedCommands.registerCommand("Auto Shoot Stop", superSystem.stopShootWithCondition());
-        // NamedCommands.registerCommand("Intake Up Sequence", 
-        //     Commands.sequence(
-        //         superSystem.stopIntaking(), 
-        //         superSystem.intakeUp()
-        //     ));
+    // public static void initNamedCommands(SuperSystem superSystem, NerdDrivetrain swerveDrive) {
+    //     // SWERVE2
+    //     NamedCommands.registerCommand("Reset Pose", swerveDrive.resetPoseWithAprilTags(0.2));
 
-        // SHOOTER
-        NamedCommands.registerCommand("Flywheel Start", superSystem.spinUpFlywheel());
-        NamedCommands.registerCommand("Flywheel Start Distance", superSystem.startShootWithDistance());
-        NamedCommands.registerCommand("Flywheel Stop Distance", superSystem.stopShootWithDistance());
-        NamedCommands.registerCommand("Hood Flywheel Start Distance", superSystem.startHoodShootWithDistance());
-        NamedCommands.registerCommand("Hood Flywheel Stop Distance", superSystem.stopHoodShootWithDistance());
-        NamedCommands.registerCommand("Flywheel Start 0", superSystem.spinUpFlywheel(34));
-        NamedCommands.registerCommand("Flywheel Start 45", superSystem.spinUpFlywheel(35.65));
-        NamedCommands.registerCommand("Flywheel Start 60", superSystem.spinUpFlywheel(42.9));
-        NamedCommands.registerCommand("Flywheel Stop", superSystem.stopFlywheel());
-        NamedCommands.registerCommand("Turn to Hub", superSystem.turnToHub(3.0));
+    //     // INTAKE
+    //     NamedCommands.registerCommand("Intake Down", superSystem.intakeDown());
+    //     NamedCommands.registerCommand("Intake Down Only", superSystem.intakeDownOnly());
+    //     NamedCommands.registerCommand("Intake Hold", superSystem.intakeHold());
+    //     // NamedCommands.registerCommand("Intake Up", superSystem.intakeUp());
+    //     NamedCommands.registerCommand("Intake Start", superSystem.intake());
+    //     NamedCommands.registerCommand("Intake Stop", superSystem.stopIntaking());
+    //     NamedCommands.registerCommand("Intake Hold Stop", superSystem.stopIntakeHold());
 
-        NamedCommands.registerCommand("Shoot", superSystem.shoot());
-        NamedCommands.registerCommand("Shoot Stop", superSystem.stopShooting());
-        NamedCommands.registerCommand("Shoot Distance", superSystem.shootWithDistance());
-        NamedCommands.registerCommand("Shoot Ramp Up", 
-            Commands.sequence(
-                superSystem.spinUpFlywheel(), 
-                Commands.waitSeconds(2),
-                superSystem.shoot()
-            ));
+    //     NamedCommands.registerCommand("Intake Down Sequence", 
+    //         Commands.sequence(
+    //             superSystem.intakeDown(),
+    //             superSystem.intake()
+    //         ));
+    //     NamedCommands.registerCommand("Auto Shoot Start", superSystem.startShootWithCondition());
+    //     NamedCommands.registerCommand("Auto Shoot Stop", superSystem.stopShootWithCondition());
+    //     // NamedCommands.registerCommand("Intake Up Sequence", 
+    //     //     Commands.sequence(
+    //     //         superSystem.stopIntaking(), 
+    //     //         superSystem.intakeUp()
+    //     //     ));
+
+    //     // SHOOTER
+    //     NamedCommands.registerCommand("Flywheel Start", superSystem.spinUpFlywheel());
+    //     NamedCommands.registerCommand("Flywheel Start Distance", superSystem.startShootWithDistance());
+    //     NamedCommands.registerCommand("Flywheel Stop Distance", superSystem.stopShootWithDistance());
+    //     NamedCommands.registerCommand("Hood Flywheel Start Distance", superSystem.startHoodShootWithDistance());
+    //     NamedCommands.registerCommand("Hood Flywheel Stop Distance", superSystem.stopHoodShootWithDistance());
+    //     NamedCommands.registerCommand("Flywheel Start 0", superSystem.spinUpFlywheel(34));
+    //     NamedCommands.registerCommand("Flywheel Start 45", superSystem.spinUpFlywheel(35.65));
+    //     NamedCommands.registerCommand("Flywheel Start 60", superSystem.spinUpFlywheel(42.9));
+    //     NamedCommands.registerCommand("Flywheel Stop", superSystem.stopFlywheel());
+    //     NamedCommands.registerCommand("Turn to Hub", superSystem.turnToHub(3.0));
+
+    //     NamedCommands.registerCommand("Shoot", superSystem.shoot());
+    //     NamedCommands.registerCommand("Shoot Stop", superSystem.stopShooting());
+    //     NamedCommands.registerCommand("Shoot Distance", superSystem.shootWithDistance());
+    //     NamedCommands.registerCommand("Shoot Ramp Up", 
+    //         Commands.sequence(
+    //             superSystem.spinUpFlywheel(), 
+    //             Commands.waitSeconds(2),
+    //             superSystem.shoot()
+    //         ));
             
-        NamedCommands.registerCommand("Shoot Ramp Down", 
-            Commands.sequence(
-                superSystem.stopShooting(),
-                Commands.waitSeconds(1),
-                superSystem.stopFlywheel()
-            ));
-    }
+    //     NamedCommands.registerCommand("Shoot Ramp Down", 
+    //         Commands.sequence(
+    //             superSystem.stopShooting(),
+    //             Commands.waitSeconds(1),
+    //             superSystem.stopFlywheel()
+    //         ));
+    // }
     
 }

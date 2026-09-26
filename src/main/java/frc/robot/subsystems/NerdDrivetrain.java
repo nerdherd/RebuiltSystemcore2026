@@ -6,24 +6,16 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.USE_VISION;
 import static frc.robot.Constants.LoggingConstants.kSwerveTab;
-import static frc.robot.Constants.PathPlannerConstants.kPPRotationPIDConstants;
-import static frc.robot.Constants.PathPlannerConstants.kPPTranslationPIDConstants;
-import static frc.robot.Constants.SwerveDriveConstants.kApplyRobotSpeedsRequest;
 import static frc.robot.Constants.SwerveDriveConstants.kFieldOrientedSwerveRequest;
 import static frc.robot.Constants.SwerveDriveConstants.kRobotOrientedSwerveRequest;
 import static frc.robot.Constants.SwerveDriveConstants.kTargetDriveController;
 import static frc.robot.Constants.SwerveDriveConstants.kTargetDriveMaxLateralVelocity;
 import static frc.robot.Constants.SwerveDriveConstants.kTowSwerveRequest;
 
-import java.util.HashMap;
-
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.linalg.VecBuilder;
@@ -31,62 +23,57 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.util.sendable.Sendable;
-import org.wpilib.util.sendable.SendableBuilder;
-import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.smartdashboard.Field2d;
+import org.wpilib.telemetry.TelemetryLoggable;
+import org.wpilib.telemetry.TelemetryTable;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
 import org.wpilib.command2.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
 import frc.robot.Constants.VisionConstants.Camera;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.util.NerdyMath;
-import frc.robot.util.logging.NerdLog;
-import frc.robot.util.logging.Reportable;
+import frc.robot.util.nerd_logging.NerdLog;
+import frc.robot.util.nerd_logging.Reportable;
+import frc.robot.util.nerd_math.NerdyMath;
 import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightHelpers.PoseEstimate;
 
-public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, Reportable, Sendable {
+public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, Reportable, TelemetryLoggable {
     public final Field2d field;
     public boolean useMegaTag2 = false;
-
+    
     public NerdDrivetrain(SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
 
-        RobotConfig robotConfig = null;
-        try {
-            robotConfig = RobotConfig.fromGUISettings();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // RobotConfig robotConfig = null;
+        // try {
+        //     robotConfig = RobotConfig.fromGUISettings();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
 
-        AutoBuilder.configure(
-            this::getPose,
-            this::resetPose,
-            this::getChassisVelocities,
-            (speeds, feedforwards) -> setControl(
-                kApplyRobotSpeedsRequest.withSpeeds(speeds)
-                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-                ),
-            new PPHolonomicDriveController(
-                kPPTranslationPIDConstants, 
-                kPPRotationPIDConstants),  
-            robotConfig,
-            () -> {
-                var alliance = MatchState.getAlliance();
-                return alliance.isPresent() ? (alliance.get() == Alliance.RED) : false;
-            },
-            this
-        );
+        // AutoBuilder.configure(
+        //     this::getPose,
+        //     this::resetPose,
+        //     this::getChassisVelocities,
+        //     (speeds, feedforwards) -> setControl(
+        //         kApplyRobotSpeedsRequest.withVelocity(speeds)
+        //             .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+        //             .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+        //         ),
+        //     new PPHolonomicDriveController(
+        //         kPPTranslationPIDConstants, 
+        //         kPPRotationPIDConstants),  
+        //     robotConfig,
+        //     () -> {
+        //         var alliance = MatchState.getAlliance();
+        //         return alliance.isPresent() ? (alliance.get() == Alliance.RED) : false;
+        //     },
+        //     this
+        // );
 
         field = new Field2d();
 
@@ -97,8 +84,6 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
     @Override
     public void periodic() {
         field.setRobotPose(getPose());
-        field.getObject("Look Ahead Ring Drive").setPose(getLookAheadPose(ShooterConstants.kLookAheadRingDriveFactor));
-        field.getObject("Look Ahead").setPose(getLookAheadPose(ShooterConstants.kLookAheadFactor));
 
         if (USE_VISION) {
             // visionUpdate(Camera.Example);
@@ -165,9 +150,9 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
      * resets the target drive controller for {@link #driveToTarget(Pose2d)}
      */
     public void resetTargetDrive() {
-        kTargetDriveController.reset("x", getPose().getX(), getFieldOrientedSpeeds().vx * 0.1);
-        kTargetDriveController.reset("y", getPose().getY(), getFieldOrientedSpeeds().vy * 0.1);
-        kTargetDriveController.reset("r", getSwerveHeadingRadians(), getFieldOrientedSpeeds().omega * 0.1);
+        kTargetDriveController.reset("x", getPose().getX(), getFieldOrientedVelocities().vx * 0.1);
+        kTargetDriveController.reset("y", getPose().getY(), getFieldOrientedVelocities().vy * 0.1);
+        kTargetDriveController.reset("r", getSwerveHeadingRadians(), getFieldOrientedVelocities().omega * 0.1);
     }
 
     // ----------------------------------------- Helper Functions ----------------------------------------- //
@@ -187,16 +172,16 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
 
     /** the position we will be one step in time */
     public Pose2d getLookAheadPose(double factor) {
-        ChassisVelocities speeds = getFieldOrientedSpeeds();
-        return getPose().plus(new Transform2d(speeds.vx, speeds.vy, Rotation2d.kZero).times(factor));
+        ChassisVelocities speeds = getFieldOrientedVelocities();
+        return getPose().plus(new Transform2d(speeds.vx, speeds.vy, Rotation2d.ZERO).times(factor));
     }
 
     /** gets the ChassisVelocities from odometry */
     public ChassisVelocities getChassisVelocities() {
-        return getState().Speeds;
+        return getState().Velocity;
     }
 
-    public ChassisVelocities getFieldOrientedSpeeds() {
+    public ChassisVelocities getFieldOrientedVelocities() {
         return getChassisVelocities();
     }
 
@@ -227,6 +212,15 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         return "it's chill";
     }
 
+    private double pollStatorCurrentSum() {
+        double sum = 0;
+        for (int i = 0; i < 4; i++) {
+            sum += Math.abs(getModule(i).getDriveMotor().getTorqueCurrent().getValueAsDouble());
+            sum += Math.abs(getModule(i).getSteerMotor().getTorqueCurrent().getValueAsDouble());
+        }
+        return sum;
+    }
+
     // ----------------------------------------- Vision Functions ----------------------------------------- //
 
     /**
@@ -253,7 +247,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
       );
     }
 
-    private HashMap<Camera, Double> lastTimestamps = new HashMap<>();    
+    // private HashMap<Camera, Double> lastTimestamps = new HashMap<>();    
     public void visionUpdate(Camera limelight, boolean useReset) {
         if (LimelightHelpers.getCurrentPipelineIndex(limelight.name) != 0) return;
         if (!useMegaTag2) {
@@ -281,10 +275,10 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
             addVisionMeasurement(mt.pose, Utils.getCurrentTimeSeconds());
         }
     }
-    private Pose2d nullPose = new Pose2d(-100,-100, Rotation2d.kZero);
+    private Pose2d nullPose = new Pose2d(-100,-100, Rotation2d.ZERO);
 
     public void recalibrateGyroMT1() {
-        resetRotation((RobotContainer.IsRedSide()) ? Rotation2d.k180deg : Rotation2d.kZero);
+        resetRotation((RobotContainer.IsRedSide()) ? Rotation2d.k180deg : Rotation2d.ZERO);
         useMegaTag2 = false;
     }
 
@@ -295,7 +289,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
      * @see {@link #setOperatorPerspectiveForward} also for more custom setting
      */
     public void setDriverHeadingForward() {
-        setOperatorPerspectiveForward(RobotContainer.IsRedSide() ? Rotation2d.k180deg : Rotation2d.kZero);
+        setOperatorForwardDirection(RobotContainer.IsRedSide() ? Rotation2d.k180deg : Rotation2d.ZERO);
     }
 
     /** 
@@ -303,7 +297,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
      * @see {@link #setOperatorPerspectiveForward} also for more custom setting
      */
     public void setRobotHeadingForward() {
-        setOperatorPerspectiveForward(getPose().getRotation());
+        setOperatorForwardDirection(getPose().getRotation());
     }
     
     /**
@@ -342,59 +336,53 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
 
     @Override
     public void initializeLogging() {
-        NerdLog.get().logData(kSwerveTab + "/Robot Field", field, LOG_LEVEL.MINIMAL);
+        NerdLog.logData(kSwerveTab + "/Robot Field", field, LOG_LEVEL.MINIMAL);
 
         ///////////
         /// ALL ///
         ///////////
-        NerdLog.get().logData(kSwerveTab + "/Commands", this, LOG_LEVEL.ALL);
+        NerdLog.logData(kSwerveTab + "/Commands", this, LOG_LEVEL.ALL);
         if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.ALL) {
             Field2d positionField = new Field2d();
             for (FieldPositions position : FieldPositions.values()) {
                 positionField.getObject(position.name() + "-blue").setPose(position.blue);
                 positionField.getObject(position.name() + "-red").setPose(position.red);
             }
-            NerdLog.get().logData(kSwerveTab +"/Object Field", positionField, LOG_LEVEL.ALL);
+            NerdLog.logData(kSwerveTab +"/Object Field", positionField, LOG_LEVEL.ALL);
         }
         for (Camera camera : Camera.values())
-            NerdLog.get().logBoolean(kSwerveTab + "/" + camera.name + " detecting", () -> LimelightHelpers.getTV(camera.name), LOG_LEVEL.ALL);
+            NerdLog.logBoolean(kSwerveTab + "/" + camera.name + " detecting", () -> LimelightHelpers.getTV(camera.name), LOG_LEVEL.ALL);
 
-        NerdLog.get().logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.ALL);
+        NerdLog.logStructSerializable(kSwerveTab + "/Field Chassis Speeds", () -> getFieldOrientedVelocities(), LOG_LEVEL.ALL);
+        NerdLog.logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.ALL);
 
         //////////////
         /// MEDIUM ///
         //////////////
-        NerdLog.get().logStructSerializable(kSwerveTab + "/Field Chassis Speeds", () -> getFieldOrientedSpeeds(), LOG_LEVEL.MEDIUM);
-        NerdLog.get().logNumber(kSwerveTab + "/Swerve Heading", this::getSwerveHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
-        NerdLog.get().logNumber(kSwerveTab + "/Driver Heading", this::getDriverHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
-        NerdLog.get().logBoolean(kSwerveTab + "/Using MT2", () -> this.useMegaTag2, LOG_LEVEL.MEDIUM);
+        NerdLog.logNumber(kSwerveTab + "/Swerve Heading", this::getSwerveHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
+        NerdLog.logNumber(kSwerveTab + "/Driver Heading", this::getDriverHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
+        NerdLog.logBoolean(kSwerveTab + "/Using MT2", () -> this.useMegaTag2, LOG_LEVEL.MEDIUM);
         
         //////////////
         /// MINIMAL //
         //////////////
         for (int i = 0; i < 4; i++) {
-            NerdLog.get().logSignal(kSwerveTab + "/Temperatures/Drive " + i, getModule(i).getDriveMotor().getDeviceTemp(false), getModule(i).getDriveMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
-            NerdLog.get().logSignal(kSwerveTab + "/Temperatures/Turn " + i, getModule(i).getSteerMotor().getDeviceTemp(false), getModule(i).getSteerMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
-            NerdLog.getNT().logBoolean(kSwerveTab + "/Connected/Drive " + i, getModule(i).getDriveMotor()::isConnected, LOG_LEVEL.MINIMAL);
-            NerdLog.getNT().logBoolean(kSwerveTab + "/Connected/Turn " + i, getModule(i).getSteerMotor()::isConnected, LOG_LEVEL.MINIMAL);
-            NerdLog.get().logSignal(kSwerveTab + "/Torque Current/Drive " + i, getModule(i).getDriveMotor().getTorqueCurrent(false), getModule(i).getDriveMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
-            NerdLog.get().logSignal(kSwerveTab + "/Torque Current/Turn " + i, getModule(i).getSteerMotor().getTorqueCurrent(false), getModule(i).getSteerMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
+            NerdLog.logSignal(kSwerveTab + "/Temperatures/Drive " + i, getModule(i).getDriveMotor().getDeviceTemp(false), getModule(i).getDriveMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
+            NerdLog.logSignal(kSwerveTab + "/Temperatures/Turn " + i, getModule(i).getSteerMotor().getDeviceTemp(false), getModule(i).getSteerMotor().getNetwork().getName(), LOG_LEVEL.MINIMAL);
+            NerdLog.logBoolean(kSwerveTab + "/Connected/Drive " + i, getModule(i).getDriveMotor()::isConnected, LOG_LEVEL.MINIMAL);
+            NerdLog.logBoolean(kSwerveTab + "/Connected/Turn " + i, getModule(i).getSteerMotor()::isConnected, LOG_LEVEL.MINIMAL);
         }
+        NerdLog.logNumber(kSwerveTab +"/Stator Current Sum", this::pollStatorCurrentSum, "A", LOG_LEVEL.MINIMAL);
     }
 
     @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Subsystem");
+    public void logTo(TelemetryTable table) {
+        var defaultCommand = getDefaultCommand();
+        table.log(".hasDefault", defaultCommand != null);
+        table.log(".default", defaultCommand != null ? defaultCommand.getName() : "none");
 
-        builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
-        builder.addStringProperty(
-            ".default",
-            () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
-            null);
-        builder.addBooleanProperty(".hasCommand", () -> getCurrentCommand() != null, null);
-        builder.addStringProperty(
-            ".command",
-            () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
-            null);
-  }
+        var currentCommand = getCurrentCommand();
+        table.log(".hasCommand", currentCommand != null);
+        table.log(".command", currentCommand != null ? currentCommand.getName() : "none");
+    }
 }

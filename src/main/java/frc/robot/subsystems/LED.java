@@ -4,6 +4,7 @@ import static frc.robot.Constants.LoggingConstants.kSubsystemTab;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -14,8 +15,8 @@ import com.ctre.phoenix6.hardware.CANdle;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants.LEDConstants.LEDSegments;
 import frc.robot.generated.TunerConstants;
-import frc.robot.util.logging.NerdLog;
-import frc.robot.util.logging.Reportable;
+import frc.robot.util.nerd_logging.NerdLog;
+import frc.robot.util.nerd_logging.Reportable;
 
 public class LED extends SubsystemBase implements Reportable {
     private final CANdle candle;
@@ -27,7 +28,7 @@ public class LED extends SubsystemBase implements Reportable {
      * @param configuration
      */
     public LED(int id, CANdleConfiguration configuration) {
-		CANdle candle = new CANdle(id);
+		CANdle candle = new CANdle(id, new CANBus("can_s1"));
 		if (!candle.isConnected()) {
 			candle.close();
 			candle = new CANdle(id, TunerConstants.kCANBus);
@@ -72,7 +73,7 @@ public class LED extends SubsystemBase implements Reportable {
 
     @Override
     public void initializeLogging() {
-        NerdLog.get().logSignal(kSubsystemTab + "CANdle/Temperature", candle.getDeviceTemp(false), candle.getNetwork().getName(), LOG_LEVEL.MINIMAL);
-        NerdLog.get().logBoolean(kSubsystemTab + "CANdle/Connected", candle::isConnected, LOG_LEVEL.MINIMAL);
+        NerdLog.logSignal(kSubsystemTab + "CANdle/Temperature", candle.getDeviceTemp(false), candle.getNetwork().getName(), LOG_LEVEL.MINIMAL);
+        NerdLog.logBoolean(kSubsystemTab + "CANdle/Connected", candle::isConnected, LOG_LEVEL.MINIMAL);
     }
 }

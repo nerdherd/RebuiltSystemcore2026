@@ -6,6 +6,8 @@ package frc.robot;
 
 import static frc.robot.Constants.SwerveDriveConstants.kRobotOrientedVelocity;
 
+import java.util.NoSuchElementException;
+
 import dev.doglog.DogLog;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -13,14 +15,10 @@ import org.wpilib.networktables.StringSubscriber;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.system.RobotController;
 import org.wpilib.hardware.power.PowerDistribution.ModuleType;
-import org.wpilib.telemetry.Telemetry;
-import org.wpilib.tunable.Tunables;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
@@ -56,18 +54,18 @@ public class RobotContainer {
    */
   public RobotContainer() {
     swerveDrive = TunerConstants.createDrivetrain();
-
-    // if (Constants.USE_SUBSYSTEMS) { // add subsystems
-    //   superSystem = new SuperSystem(swerveDrive);
-    //   superSystem.initializeLEDs();
-    //   Autos.initNamedCommands(superSystem, swerveDrive);
-    // }
     
-    // Subsystems.init();
+    if (Constants.USE_SUBSYSTEMS) { // add subsystems
+      superSystem = new SuperSystem(swerveDrive);
+      superSystem.initializeLEDs();
+      // Autos.initNamedCommands(superSystem, swerveDrive);
+    }
+    
+    Subsystems.init();
     // Autos.initAutoChooser();
-    // initializeLogging();
+    initializeLogging();
 
-    // NerdLog.reportInfo("Initialization Complete");
+    NerdLog.reportInfo("Initialization Complete");
   }
 
   public static void refreshAlliance() {
@@ -219,63 +217,9 @@ public class RobotContainer {
   }
 
   public void configureBindings_test() {
-
-    testController.buttonRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Right Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Right Test", "bye")));
-    testController.buttonDown()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Down Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Down Test", "bye")));
-    testController.buttonUp()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Up Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Up Test", "bye")));
-    testController.buttonLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Left Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Left Test", "bye")));
-
-    testController.bumperLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Bumper L Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Bumper L Test", "bye")));
-    testController.bumperRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Bumper R Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Bumper R Test", "bye")));
-    
-    testController.triggerLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Trigger L Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Trigger L Test", "bye")));
-    testController.triggerRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Trigger R Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Trigger R Test", "bye")));
-
-   testController.dpadUp()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Up Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Up Test", "bye")));
-    testController.dpadRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Right Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Right Test", "bye")));
-    testController.dpadDown()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Down Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Down Test", "bye")));
-    testController.dpadLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Dpad Left Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Dpad Left Test", "bye")));
-
-    testController.controllerLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Controller Left Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Controller Left Test", "bye")));
-    testController.controllerRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Controller Right Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Controller Right Test", "bye")));
-    
-    testController.joystickLeft()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Left Joy Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Left Joy Test", "bye")));
-    testController.joystickRight()
-      .onTrue(Commands.runOnce(() -> Telemetry.log("Button Right Joy Test", "hi")))
-      .onFalse(Commands.runOnce(() -> Telemetry.log("Button Right Joy Test", "bye")));
-      
+    Controller.configureDebugBindings(testController);
   }
-  
+
   public StringSubscriber printLog = null;
   public void initializeLogging() {
     if (printLog == null) printLog = DogLog.tunable("Print", "", (value) -> NerdLog.reportInfo("" + value));
@@ -319,12 +263,14 @@ public class RobotContainer {
     // if (!RobotState.isFMSAttached()) { DogLog.forceNT.log("Match Info/Shift Name", "DriverStation not attached"); return 0.0; };
     boolean wonAuto = true;
     if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.MEDIUM) {
-      String data = MatchState.getGameData().get();
-      if (!data.isEmpty()) switch (data.charAt(0)) {
-        case 'B': wonAuto = !isRedSide; break;
-        case 'R': wonAuto = isRedSide; break;
-        default: break;
-      } 
+      try {
+        String data = MatchState.getGameData().get();
+        if (!data.isEmpty()) switch (data.charAt(0)) {
+          case 'B': wonAuto = !isRedSide; break;
+          case 'R': wonAuto = isRedSide; break;
+          default: break;
+        } 
+      } catch (NoSuchElementException e) {}
       DogLog.log("Match Info/Won Auto?", wonAuto);
     }
 

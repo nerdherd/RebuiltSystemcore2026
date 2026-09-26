@@ -50,7 +50,7 @@ import frc.robot.util.nerd_math.NerdyMath;
 import frc.robot.util.nerd_math.Translation2dSlewRateLimiter;
 import frc.robot.util.nerd_math.NerdFlippingUtil;
 import frc.robot.util.nerd_math.MultiProfiledPIDController;
-import frc.robot.util.nerd_constants.PIDVSAGConstants;
+import frc.robot.util.nerd_constants.NerdPIDConstants;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -140,7 +140,7 @@ public final class Constants {
     ///////////////////////////
     
     public static final double kTurnToAngleMaxVelocity = 7.00; // rad/s
-    public static final PIDVSAGConstants kTurnToAnglePIDConstants = new PIDVSAGConstants(12.0, 0.0, 0.5);
+    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.5);
     public static final Constraints kTurnToAngleTolerances = new Constraints(0.017, 0.05); 
 
     ////////////////////////////////////////////
@@ -175,12 +175,12 @@ public final class Constants {
 
     /** @see NerdDrivetrain.driveToTarget() */
     public static final double kTargetDriveMaxLateralVelocity = 5.0;
-    public static final PIDVSAGConstants kTargetDriveLateralPID = new PIDVSAGConstants(5.0, 0.0, 0.5);
+    public static final NerdPIDConstants kTargetDriveLateralPID = new NerdPIDConstants(5.0, 0.0, 0.5);
 
     /** m/s and m/s/s @see NerdDrivetrain.driveToTarget() */
     public static final Constraints kTargetDriveLateralConstraints = new Constraints(kTargetDriveMaxLateralVelocity, kTargetDriveMaxLateralVelocity);
     public static final double kTargetDriveMaxRotationalVelocity = 9.4;
-    public static final PIDVSAGConstants kTargetDriveRotationalPID = new PIDVSAGConstants(4.0, 0.0, 0.2);
+    public static final NerdPIDConstants kTargetDriveRotationalPID = new NerdPIDConstants(4.0, 0.0, 0.2);
 
     /** rad/s and rad/s/s @see NerdDrivetrain.driveToTarget() */
     public static final Constraints kTargetDriveRotationalConstraints = new Constraints(kTargetDriveMaxRotationalVelocity, kTargetDriveMaxRotationalVelocity);
@@ -222,13 +222,13 @@ public final class Constants {
     public static final double kPP_I = 0.0;
     public static final double kPP_D = 0.0;
 
-    public static final PIDVSAGConstants kPPTranslationPIDConstants = new PIDVSAGConstants(kPP_P, kPP_I, kPP_D);
+    public static final NerdPIDConstants kPPTranslationPIDConstants = new NerdPIDConstants(kPP_P, kPP_I, kPP_D);
 
     public static final double kPP_ThetaP = 4.0; //3
     public static final double kPP_ThetaI = 0;
     public static final double kPP_ThetaD = 0.1;
 
-    public static final PIDVSAGConstants kPPRotationPIDConstants = new PIDVSAGConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public static final NerdPIDConstants kPPRotationPIDConstants = new NerdPIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
   }
 
   public static final class LoggingConstants {

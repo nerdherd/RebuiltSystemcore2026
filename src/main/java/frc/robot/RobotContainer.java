@@ -39,6 +39,7 @@ import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 public class RobotContainer {
   public NerdDrivetrain swerveDrive;
   public PowerDistribution pdp = new PowerDistribution(CANPort.CAN_D0, 1, ModuleType.REV);
+  public Autos autoManager;
   
   public SuperSystem superSystem;
 
@@ -54,15 +55,16 @@ public class RobotContainer {
    */
   public RobotContainer() {
     swerveDrive = TunerConstants.createDrivetrain();
+    autoManager = new Autos(superSystem, swerveDrive);
     
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
       superSystem.initializeLEDs();
-      // Autos.initNamedCommands(superSystem, swerveDrive);
+      autoManager.initNamedCommands(superSystem, swerveDrive);
     }
     
     Subsystems.init();
-    // Autos.initAutoChooser();
+    autoManager.initAutoChooser();
     initializeLogging();
 
     NerdLog.reportInfo("Initialization Complete");
@@ -248,7 +250,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.getSelected();
+    return Autos.autoChooser.selectedCommand();
   }
 
   public void disableAllMotors_Test() {

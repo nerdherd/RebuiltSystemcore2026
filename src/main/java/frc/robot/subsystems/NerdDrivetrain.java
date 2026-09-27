@@ -86,6 +86,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
     @Override
     public void periodic() {
         field.setRobotPose(getPose());
+        field.getObject("robot2").setPose(getPose());
         DogLog.log("pose", getPose());
         if (USE_VISION) {
             // visionUpdate(Camera.Example);
@@ -356,7 +357,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
             NerdLog.logBoolean(kSwerveTab + "/" + camera.name + " detecting", () -> LimelightHelpers.getTV(camera.name), LOG_LEVEL.ALL);
 
         NerdLog.logStructSerializable(kSwerveTab + "/Field Chassis Speeds", () -> getFieldOrientedVelocities(), LOG_LEVEL.ALL);
-        NerdLog.logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.MEDIUM);
+        NerdLog.logSwerveModules(kSwerveTab + "/Swerve Module States", this::getState, LOG_LEVEL.ALL);
 
         //////////////
         /// MEDIUM ///

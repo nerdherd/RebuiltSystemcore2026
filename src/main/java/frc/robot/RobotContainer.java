@@ -94,9 +94,10 @@ public class RobotContainer {
       // Turn
       () -> -driverController.getRightX(), 
       // use turn to angle
-      () -> driverController.getBumperRight(),
+      () -> driverController.getBumperRight() || driverController.getButtonDown(),
       // turn to angle target direction, 0.0 to use manual
-      () -> swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset,
+      () -> (driverController.getBumperRight()) ? (swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset) :
+              ((IsRedSide()) ? 0.0 : 180.0),
       // robot oriented adjustment (dpad)
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
@@ -188,7 +189,7 @@ public class RobotContainer {
         // .onTrue(superSystem.spinUpFlywheel())
         .onFalse(superSystem.stopFlywheel());
       operatorController.triggerLeft()
-        .whileTrue(superSystem.spinUpFlywheel())
+        .onTrue(superSystem.spinUpFlywheel())
         .onFalse(superSystem.stopFlywheel());
       operatorController.bumperRight()
         .whileTrue(superSystem.shootWithCondition())

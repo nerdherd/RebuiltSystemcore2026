@@ -2,40 +2,42 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.LoggingConstants.kSupersystemTab;
 import static frc.robot.Constants.Subsystems.conveyor;
+import static frc.robot.Constants.Subsystems.hood;
 import static frc.robot.Constants.Subsystems.indexer;
 import static frc.robot.Constants.Subsystems.intakeRoller;
 import static frc.robot.Constants.Subsystems.intakeSlapdown;
 import static frc.robot.Constants.Subsystems.leds;
 import static frc.robot.Constants.Subsystems.shooter;
 import static frc.robot.Constants.Subsystems.useLEDs;
-import static frc.robot.Constants.Subsystems.hood;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import dev.doglog.DogLog;
-import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.networktables.DoubleSubscriber;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.MatchType;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.networktables.DoubleSubscriber;
+
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import dev.doglog.DogLog;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ZoneConstants;
 import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
+import frc.robot.Constants.ZoneConstants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.RebuiltLEDCommand;
 import frc.robot.commands.SwerveJoystickCommand;
 import frc.robot.subsystems.template.TemplateSubsystem;
-import frc.robot.util.nerd_math.NerdyMath;
 import frc.robot.util.nerd_logging.NerdLog;
 import frc.robot.util.nerd_logging.Reportable;
+import frc.robot.util.nerd_math.NerdyMath;
 
 public class SuperSystem implements Reportable {
 
@@ -130,6 +132,8 @@ public class SuperSystem implements Reportable {
     public void startShoot() {
         indexer.setDesiredValue(10);
         conveyor.setDesiredValue(6);
+        if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) hood.setDesiredValue(HoodConstants.kUpPos);
+        else hood.setDesiredValue(HoodConstants.kDownPos);
     }
 
     public Command shoot() {
@@ -155,6 +159,7 @@ public class SuperSystem implements Reportable {
             } else {
                 indexer.setDesiredValue(0);
                 conveyor.setDesiredValue(0);
+                hood.setDesiredValue(HoodConstants.kDownPos);
             }
         }, indexer, conveyor)
         .finallyDo(
@@ -248,7 +253,8 @@ public class SuperSystem implements Reportable {
     public Command stopShooting() {
         return Commands.parallel(
             indexer.setDesiredValueCommand(0),
-            conveyor.setDesiredValueCommand(0)
+            conveyor.setDesiredValueCommand(0),
+            hoodDown()
         );
     }
 
@@ -264,11 +270,11 @@ public class SuperSystem implements Reportable {
         return Commands.run(() -> {
             if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
                 shooter.setDesiredValue(65);
-                hood.setDesiredValue(Constants.HoodConstants.kUpPos);
+                // hood.setDesiredValue(Constants.HoodConstants.kUpPos);
 
             } else {
                 shooter.setDesiredValue(45);
-                hood.setDesiredValue(Constants.HoodConstants.kDownPos);
+                // hood.setDesiredValue(Constants.HoodConstants.kDownPos);
             }
         });
     }

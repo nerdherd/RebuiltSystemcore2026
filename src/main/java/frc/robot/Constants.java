@@ -378,8 +378,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.120683)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.271139);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.119098)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.250267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()
@@ -404,7 +404,7 @@ public final class Constants {
     // Regression of a*x^2 + b
     // Update at -- on -/--/2026
     public static final double kShootWithDistanceA = 0.84;  //<- these are chezy values, these are yesterday's values -> 0.88; // a
-    public static final double kShootWithDistanceB = 31.60409; // b
+    public static final double kShootWithDistanceB = 31.0; // b 31.60409
 
     public static final double kShootWithDistanceHoodA = 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
     public static final double kShootWithDistanceHoodB = 35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b

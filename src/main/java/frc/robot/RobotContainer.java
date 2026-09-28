@@ -94,10 +94,10 @@ public class RobotContainer {
       // Turn
       () -> -driverController.getRightX(), 
       // use turn to angle
-      () -> driverController.getBumperRight() || driverController.getButtonDown(),
+      () -> driverController.getBumperRight() || driverController.getTriggerLeft(),
       // turn to angle target direction, 0.0 to use manual
       () -> (driverController.getBumperRight()) ? (swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset) :
-              ((IsRedSide()) ? 0.0 : 180.0),
+              ((IsRedSide()) ? 0.0 : (Math.PI)),
       // robot oriented adjustment (dpad)
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
@@ -109,7 +109,7 @@ public class RobotContainer {
       // tow supplier
       () -> driverController.getBumperLeft(), 
       // precision/programmer mode :)
-      () -> driverController.getTriggerLeftAxis()
+      () -> (driverController.getButtonLeft()) ? 1.0 : 0.0
     );
     
     swerveDrive.setDefaultCommand(swerveJoystickCommand);

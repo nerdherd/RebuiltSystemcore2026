@@ -35,6 +35,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.RebuiltLEDCommand;
 import frc.robot.commands.SwerveJoystickCommand;
 import frc.robot.subsystems.template.TemplateSubsystem;
+import frc.robot.subsystems.template.TemplateSubsystem.SubsystemMode;
 import frc.robot.util.nerd_logging.NerdLog;
 import frc.robot.util.nerd_logging.Reportable;
 import frc.robot.util.nerd_math.NerdyMath;
@@ -131,9 +132,11 @@ public class SuperSystem implements Reportable {
 
     public void startShoot() {
         indexer.setDesiredValue(10);
-        conveyor.setDesiredValue(6);
-        if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) hood.setDesiredValue(HoodConstants.kUpPos);
-        else hood.setDesiredValue(HoodConstants.kDownPos);
+        conveyor.setDesiredValue(8);
+        if (!shooting) {
+            if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) hood.setDesiredValue(HoodConstants.kUpPos);
+            else hood.setDesiredValue(HoodConstants.kDownPos);
+        }
     }
 
     public Command shoot() {
@@ -205,9 +208,11 @@ public class SuperSystem implements Reportable {
             }, shooter);
     }
 
+    private boolean shooting = false;
     public Command shootWithDistance() {
         return Commands.run(
             () -> {
+                shooting = true;
                 // calculate distance
                 double distance = getHubDistance();
                 double rps = 0.0;
@@ -222,7 +227,7 @@ public class SuperSystem implements Reportable {
                 }
                 // spin up flywheel
                 shooter.setDesiredValue(Math.min(55.0, rps));
-            }, shooter);
+            }, shooter).finallyDo(() -> shooting = false);
     }
 
     public double shootSpeed = 0;
@@ -360,7 +365,11 @@ public class SuperSystem implements Reportable {
     }
 
     public void resetSubsystemValues() {
-        applySubsystems((s) -> s.setDesiredValue(s.getDefaultValue()));
+        applySubsystems((s) -> {
+            s.setDesiredValue(s.getDefaultValue());
+            if (s.mode == SubsystemMode.POSITION)
+                s.primaryMotor.setPosition(s.getDefaultValue());
+        });
     }
 
     public double getHubDistance() {

@@ -87,7 +87,7 @@ public class TemplateSubsystem extends SubsystemBase implements Reportable {
 		PROFILED_VELOCITY
 	}
 	/** {@link SubsystemMode} of this subsystem */
-	private final SubsystemMode mode;
+	public final SubsystemMode mode;
 
 	/**
 	 * 

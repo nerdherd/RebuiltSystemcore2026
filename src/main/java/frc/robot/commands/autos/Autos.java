@@ -1,34 +1,22 @@
 package frc.robot.commands.autos;
 
-import org.wpilib.tunable.Selectable;
 import org.wpilib.tunable.Tunables;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import org.wpilib.math.controller.PIDController;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.telemetry.TelemetryLoggable;
-
-import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.subsystems.SuperSystem;
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 
-import static frc.robot.Constants.LoggingConstants.kAutosTab;
-
 
 public final class Autos {
     public static final AutoChooser autoChooser = new AutoChooser();
     public static AutoFactory autoFactory;
-    public NerdDrivetrain nerdDrivetrain;
     public SuperSystem superSystem;
 
-    public Autos (SuperSystem superSystem, NerdDrivetrain nerdDrivetrain) {
+    public Autos (SuperSystem superSystem) {
         this.superSystem = superSystem;
-        this.nerdDrivetrain = nerdDrivetrain;
     }
 
     public void initAutoChooser() {
@@ -71,11 +59,14 @@ public final class Autos {
 
     }
 
-    public void initNamedCommands(SuperSystem superSystem, NerdDrivetrain nerdDrivetrain) {
-            
-            autoFactory = new AutoFactory(nerdDrivetrain::getPose, nerdDrivetrain::resetPose, nerdDrivetrain::followTrajectory, false, nerdDrivetrain);
+    public void initNamedCommands() {
+            autoFactory = new AutoFactory(
+                superSystem.swerveDrivetrain::getPose, 
+                superSystem.swerveDrivetrain::resetPose, 
+                superSystem.swerveDrivetrain::followTrajectory, 
+                true, superSystem.swerveDrivetrain);
 
-            autoFactory.bind("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnly(), Commands.waitSeconds(0.25), superSystem.intakeHold()));
+            autoFactory.bind("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.25), superSystem.intakeHoldAuto()));
             
             autoFactory.bind("Intake Start", superSystem.intake());
 
@@ -159,9 +150,9 @@ public final class Autos {
                     superSystem.turnToHub(0.7),
                     Commands.sequence(
                         Commands.waitSeconds(0.7),
-                        superSystem.shoot(),
+                        superSystem.startShootCommand(),
                         Commands.waitSeconds(2.3),
-                        superSystem.setShooterCommand(0),
+                        superSystem.setFlywheelCommand(0),
                         superSystem.stopConveyor()  
                     )
                 )
@@ -177,9 +168,9 @@ public final class Autos {
                     superSystem.turnToHub(0.7),
                     Commands.sequence(
                         Commands.waitSeconds(0.7),
-                        superSystem.shoot(),
+                        superSystem.startShootCommand(),
                         Commands.waitSeconds(2.3),
-                        superSystem.setShooterCommand(0),
+                        superSystem.setFlywheelCommand(0),
                         superSystem.stopConveyor()  
                     )
                 )

@@ -1,48 +1,43 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.LoggingConstants.kSupersystemTab;
-import static frc.robot.Constants.Subsystems.conveyor;
-import static frc.robot.Constants.Subsystems.indexer;
-import static frc.robot.Constants.Subsystems.intakeRoller;
-import static frc.robot.Constants.Subsystems.intakeSlapdown;
-import static frc.robot.Constants.Subsystems.leds;
-import static frc.robot.Constants.Subsystems.shooter;
-import static frc.robot.Constants.Subsystems.useLEDs;
-import static frc.robot.Constants.Subsystems.hood;
+import static frc.robot.Constants.Subsystems.*;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import dev.doglog.DogLog;
-import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.networktables.DoubleSubscriber;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.MatchType;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.MathSharedStore;
+import org.wpilib.networktables.DoubleSubscriber;
+
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import dev.doglog.DogLog;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.HoodConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.Constants.ZoneConstants;
 import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
+import frc.robot.Constants.ZoneConstants;
+import frc.robot.RobotContainer;
 import frc.robot.commands.RebuiltLEDCommand;
 import frc.robot.commands.SwerveJoystickCommand;
 import frc.robot.subsystems.template.TemplateSubsystem;
-import frc.robot.util.nerd_math.NerdyMath;
+import frc.robot.subsystems.template.TemplateSubsystem.SubsystemMode;
 import frc.robot.util.nerd_logging.NerdLog;
 import frc.robot.util.nerd_logging.Reportable;
+import frc.robot.util.nerd_math.NerdyMath;
 
 public class SuperSystem implements Reportable {
 
     public static final ArrayList<TemplateSubsystem> subsystems = new ArrayList<>();
 
-    // ------------------------------------ drive ------------------------------------ //
-
+    // ----------------------------------++ DRIVE ++----------------------------------- //
     public NerdDrivetrain swerveDrivetrain;
     
     public SuperSystem(NerdDrivetrain swerveDrivetrain) {
@@ -59,10 +54,8 @@ public class SuperSystem implements Reportable {
         return autoTurnToHub.raceWith(Commands.waitSeconds(timeout));
     }
 
-    // ------------------------------------ subsystems ------------------------------------ //
-    
-    // ------------------------------------ intake ------------------------------------ //
-    
+    // ---------------------------------++ SUBSYSTEMS ++--------------------------------- //
+    // ------------------------------------- intake ------------------------------------- //
     public Command intake() {
         return Commands.parallel(
             intakeRoller.setDesiredValueCommand(11),
@@ -77,13 +70,12 @@ public class SuperSystem implements Reportable {
     public Command stopIntaking() {
         return Commands.parallel(
             intakeRoller.setDesiredValueCommand(0),
-            stopIntakeHold()
+            stopIntakeSlapdown()
         );
     }
 
-    // ------------------------------------ intake pivot ------------------------------------ //
-    
-    public Command intakeDown() {
+    // --------------------------------- intake pivot --------------------------------- //
+    public Command intakeDownAuto() {
         return Commands.sequence(
             intakeSlapdown.setDesiredValueCommand(-8),
             Commands.waitSeconds(0.2),
@@ -91,11 +83,11 @@ public class SuperSystem implements Reportable {
         );
     }
 
-    public Command intakeDownOnly() {
+    public Command intakeDownOnlyAuto() {
         return intakeSlapdown.setDesiredValueCommand(-10);
     }
 
-    public Command intakeHold() {
+    public Command intakeHoldAuto() {
         return intakeSlapdown.setDesiredValueCommand(-1.5); //change when we have bumpers
     }
 
@@ -103,7 +95,7 @@ public class SuperSystem implements Reportable {
         return intakeSlapdown.setDesiredValueCommand(-1); //change when we have bumpers
     }
 
-    public Command stopIntakeHold() {
+    public Command stopIntakeSlapdown() {
         return intakeSlapdown.setDesiredValueCommand(0.0);
     }
 
@@ -112,7 +104,6 @@ public class SuperSystem implements Reportable {
     }
 
     // ------------------------------------ conveyor ------------------------------------ //
-   
     public Command reverseConveyor() {
         return Commands.parallel(
             conveyor.setDesiredValueCommand(-5),
@@ -129,20 +120,34 @@ public class SuperSystem implements Reportable {
 
     public void startShoot() {
         indexer.setDesiredValue(10);
-        conveyor.setDesiredValue(6);
+        conveyor.setDesiredValue(8);
+        switch(shooterState) {
+            case SHOOTING:
+                if (useHoodShoot()) setHood(0.5);
+                else setHood(0.0);
+                break;
+            case PASSING:
+                if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) setHood(1.0);
+                else setHood(0.0);
+                break;
+            case NONE:
+            default: setHood(0.0); break;
+        }
     }
 
-    public Command shoot() {
+    public Command stopShoot() {
         return Commands.parallel(
-            indexer.setDesiredValueCommand(10),
-            conveyor.setDesiredValueCommand(5)
+            indexer.setDesiredValueCommand(0),
+            conveyor.setDesiredValueCommand(0),
+            hoodDownCommand()
         );
     }
-    
-    // ------------------------------------ shooter ------------------------------------ //
+
+    public Command startShootCommand() {
+        return Commands.runOnce(() -> startShoot());
+    }
     
     private double startShootTime = 0.0;
-    
     public Command shootWithCondition() {
         return Commands.run(() -> {
             if (shooter.getCurrentVelocity() > 20.0) {
@@ -164,9 +169,10 @@ public class SuperSystem implements Reportable {
                 conveyor.setDesiredValue(0);
                 startShootTime = -1.0;
             }
-            );
+        );
     }
 
+    // ------------------------------------ shooter ------------------------------------ //
     public Command autoShoot = shootWithCondition();
     
     public Command startShootWithCondition() {
@@ -192,9 +198,8 @@ public class SuperSystem implements Reportable {
                 // calculate distance
                 double distance = getHubDistance();
                 double rps = 0.0;
-                    hood.setDesiredValue(HoodConstants.kDownPos);
-                    // convert to rps
-                    rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
+                // convert to rps
+                rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
                 // spin up flywheel
                 shooter.setDesiredValue(Math.min(55.0, rps));
             }, shooter);
@@ -203,15 +208,14 @@ public class SuperSystem implements Reportable {
     public Command shootWithDistance() {
         return Commands.run(
             () -> {
+                shooterState = ShooterState.SHOOTING;
                 // calculate distance
                 double distance = getHubDistance();
                 double rps = 0.0;
                 if (useHoodShoot()) {
-                    hood.setDesiredValue(HoodConstants.kUpPos * 0.5 + HoodConstants.kDownPos * 0.5);
                     // convert to rps
                     rps = ShooterConstants.kShootWithDistanceHoodA * distance * distance + ShooterConstants.kShootWithDistanceHoodB;
                 } else {
-                    hood.setDesiredValue(HoodConstants.kDownPos);
                     // convert to rps
                     rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
                 }
@@ -221,106 +225,93 @@ public class SuperSystem implements Reportable {
     }
 
     public double shootSpeed = 0;
-   
     public DoubleSubscriber shootSpeedSub = null;
     /**
      * change shootSpeed using elastic, always defaults to 0 when 
      * the code is reloaded so save the value
      * @return
      */
-   
-    public Command shootWithTuning() {
+    public Command flywheelWithTuning() {
         if (shootSpeedSub == null) shootSpeedSub = DogLog.tunable("Shooter Speed", shootSpeed, (value) -> shootSpeed = value);
-
         return Commands.run(() -> {
+            shooterState = ShooterState.SHOOTING;
             shooter.setDesiredValue(shootSpeed);
-            if (useHoodShoot()) hood.setDesiredValue((HoodConstants.kUpPos-HoodConstants.kDownPos) * 0.5 + HoodConstants.kDownPos);
-            else hood.setDesiredValue(HoodConstants.kDownPos);
         }, shooter);
     }
     
-    public Command setShooterCommand(double speed) {
-        return Commands.parallel(
-            shooter.setDesiredValueCommand(speed)
-            );
-    }
-
-    public Command stopShooting() {
-        return Commands.parallel(
-            indexer.setDesiredValueCommand(0),
-            conveyor.setDesiredValueCommand(0)
-        );
+    public Command setFlywheelCommand(double speed) {
+        return Commands.either(
+            shooter.setDesiredValueCommand(speed),
+            stopFlywheel(),
+            () -> speed != 0.0);
     }
 
     // ------------------------------------ flywheel ------------------------------------ //
-   
-    public Command spinUpFlywheel() {
-        return Commands.parallel(
-            setShooterCommand(37)
-        );
-    }
-
-    public Command spinUpFlywheelFeeding() {
+    public Command startFeeding() {
         return Commands.run(() -> {
-            if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
+            shooterState = ShooterState.PASSING;
+            if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) 
                 shooter.setDesiredValue(65);
-                hood.setDesiredValue(Constants.HoodConstants.kUpPos);
-
-            } else {
+            else 
                 shooter.setDesiredValue(45);
-                hood.setDesiredValue(Constants.HoodConstants.kDownPos);
-            }
         });
-    }
-
-    public Command spinUpFlywheel(double speed) {
-        return Commands.parallel(
-            setShooterCommand(speed)
-        );
     }
         
     public Command stopFlywheel() {
         return Commands.parallel(
-            setShooterCommand(0.0),
-            hoodDown()
+            shooter.setDesiredValueCommand(0.0),
+            setShooterStateCommand(ShooterState.NONE)
         );
     }
+
     // ------------------------------------ hood ------------------------------------ //
-    
-    // hood is 18:1
     /** set the shooter's hood's position
      * @param value between 1 and 0, where 1 is up and 0 is down
     */
-   
-    public Command setHood(double value) {
-        value = (HoodConstants.kUpPos-HoodConstants.kDownPos) * value + HoodConstants.kDownPos;
-        return hood.setDesiredValueCommand(value);
-    }
-    
-    public Command hoodDown() {
-        return setHood(0.0);
+    public void setHood(double value) {
+        value = NerdyMath.clamp(value, 0.0, 1.0);
+        hood.setDesiredValue((HoodConstants.kUpPos-HoodConstants.kDownPos) * value + HoodConstants.kDownPos);
     }
 
-    public Command hoodUp() {
-        return setHood(1.0);
+    public Command setHoodCommand(double value) {
+        return Commands.runOnce(() -> setHood(value));
+    }
+    
+    public Command hoodDownCommand() {
+        return setHoodCommand(0.0);
+    }
+
+    public Command hoodUpCommand() {
+        return setHoodCommand(1.0);
+    }
+
+    // ------------------------------------ helper functions ------------------------------------ //
+    public enum ShooterState{NONE, SHOOTING, PASSING};
+    public ShooterState shooterState = ShooterState.NONE;
+    public Command setShooterStateCommand(ShooterState state) {
+        return Commands.runOnce(() -> shooterState = state);
     }
 
     public boolean useHoodShoot() {
         return !Constants.ZoneConstants.kShootingGroup.check(swerveDrivetrain.getPose()); 
     }
 
-    public Command HoodShootWithDistance = shootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
-
-    public Command startHoodShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(HoodShootWithDistance));
+    public double getHubDistance() {
+        Pose2d hub = FieldPositions.HUB_CENTER.get();
+        return swerveDrivetrain.getLookAheadPose(ShooterConstants.kLookAheadFactor).getTranslation().getDistance(hub.getTranslation());
     }
 
-    public Command stopHoodShootWithDistance() {
-        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(HoodShootWithDistance));
+    public void initializeLEDs() {
+        if (!useLEDs) return;
+        RebuiltLEDCommand ledCommand = new RebuiltLEDCommand(leds);
+        ledCommand.registerIntakeSupplier(() -> intakeRoller.getDesiredValue() > 0.1);
+        ledCommand.registerShooterSupplier(() -> (shooter.getDesiredValue() > 0.1) ? NerdyMath.clamp(shooter.getCurrentVelocity() / shooter.getDesiredValue(), 0.0, 1.0) : 0.0);
+        ledCommand.registerCountdownSupplier(() -> (MatchState.getMatchType() != MatchType.NONE) ? (1.0 - NerdyMath.clamp(RobotContainer.shiftTime / 10.0, 0.0, 1.0)) : 0.0);
+        leds.setDefaultCommand(ledCommand);
     }
 
-    // ------------------------------------ helper functions ------------------------------------ //
 
+    // ------------------------------------ supersystem functions ------------------------------------ //
     public static void registerSubsystem(TemplateSubsystem subsystem) {
         subsystems.add(subsystem);
     }
@@ -342,43 +333,29 @@ public class SuperSystem implements Reportable {
      * subsystems do not reenable on their own
      * @return a command to stop
      */
-    
-    public Command stopCommand() {
-        return Commands.runOnce(() -> {
-            applySubsystems((s) -> s.stop());
-        });
-    }   
+    public void stop() {
+        applySubsystems((s) -> s.stop());
+    }
 
-    public void initialize() {
+    public void enableSubsystems() {
         applySubsystems((s) -> s.setEnabled(s.useSubsystem));
     }
 
     public void resetSubsystemValues() {
-        applySubsystems((s) -> s.setDesiredValue(s.getDefaultValue()));
-    }
-
-    public double getHubDistance() {
-        Pose2d hub = FieldPositions.HUB_CENTER.get();
-        return swerveDrivetrain.getLookAheadPose(ShooterConstants.kLookAheadFactor).getTranslation().getDistance(hub.getTranslation());
-    }
-
-    public void initializeLEDs() {
-        if (!useLEDs) return;
-        RebuiltLEDCommand ledCommand = new RebuiltLEDCommand(leds);
-        ledCommand.registerIntakeSupplier(() -> intakeRoller.getDesiredValue() > 0.1);
-        ledCommand.registerShooterSupplier(() -> (shooter.getDesiredValue() > 0.1) ? NerdyMath.clamp(shooter.getCurrentVelocity() / shooter.getDesiredValue(), 0.0, 1.0) : 0.0);
-        ledCommand.registerCountdownSupplier(() -> (MatchState.getMatchType() != MatchType.NONE) ? (1.0 - NerdyMath.clamp(RobotContainer.shiftTime / 10.0, 0.0, 1.0)) : 0.0);
-        leds.setDefaultCommand(ledCommand);
+        applySubsystems((s) -> {
+            s.setDesiredValue(s.getDefaultValue());
+            if (s.mode == SubsystemMode.POSITION)
+                s.primaryMotor.setPosition(s.getDefaultValue());
+        });
     }
 
     // ------------------------------------ logging ------------------------------------ //
-    
     @Override
     public void initializeLogging() {
         applySubsystems((s) -> s.initializeLogging());
 
         NerdLog.logNumber(kSupersystemTab + "/Hub Distance", () -> getHubDistance(), "m", LOG_LEVEL.MEDIUM);
         NerdLog.logData(kSupersystemTab + "/Command Scheduler", CommandScheduler.getInstance(), LOG_LEVEL.ALL);
-        NerdLog.logBoolean(kSupersystemTab + "/useShootHood", () -> useHoodShoot() , LOG_LEVEL.MEDIUM);
+        NerdLog.logBoolean(kSupersystemTab + "/useShootHood", () -> useHoodShoot() , LOG_LEVEL.ALL);
     }
 }

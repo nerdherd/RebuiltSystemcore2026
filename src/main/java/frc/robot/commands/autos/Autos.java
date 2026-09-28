@@ -1,18 +1,31 @@
 package frc.robot.commands.autos;
 
-import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.Commands;
-import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.subsystems.SuperSystem;
-
-import static frc.robot.Constants.LoggingConstants.kAutosTab;
+import choreo.auto.AutoChooser;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 
 
 public final class Autos {
-    public static Selectable<Command> autoChooser = new Selectable<>();
+    public static final AutoChooser autoChooser = new AutoChooser();
+    public static AutoFactory autoFactory;
+    public SuperSystem superSystem;
 
-    // public static void initAutoChooser() {
+    public Autos (SuperSystem superSystem) {
+        this.superSystem = superSystem;
+    }
+
+    public void initAutoChooser() {
+
+
+        autoChooser.addRoutine("Top 2.5 w Distance", this::TopAuto);
+
+
+            
     //     autoChooser.setDefaultOption("Do Nothing", Commands.none());
         
     //     // autoChooser.addOption("Test", AutoBuilder.buildAuto("test"));
@@ -42,10 +55,25 @@ public final class Autos {
     //     // autoChooser.addOption("Top-S1Trench2.5", AutoBuilder.buildAuto("Top-S1Trench2.5"));
     //     // autoChooser.addOption("Bot-S5Trench2.5", AutoBuilder.buildAuto("Bot-S5Trench2.5"));
 
-    //     NerdLog.get().logData(kAutosTab + "/Selected Auto", autoChooser, LOG_LEVEL.MINIMAL);
-    // }
+        Tunables.publish("Autos/Chooser", autoChooser);
 
-    // public static void initNamedCommands(SuperSystem superSystem, NerdDrivetrain swerveDrive) {
+    }
+
+    public void initNamedCommands() {
+            autoFactory = new AutoFactory(
+                superSystem.swerveDrivetrain::getPose, 
+                superSystem.swerveDrivetrain::resetPose, 
+                superSystem.swerveDrivetrain::followTrajectory, 
+                true, superSystem.swerveDrivetrain);
+
+            autoFactory.bind("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.25), superSystem.intakeHoldAuto()));
+            
+            autoFactory.bind("Intake Start", superSystem.intake());
+
+            autoFactory.bind("Intake Stop", superSystem.stopIntaking());
+
+            autoFactory.bind("Flywheel Start", superSystem.shootWithDistance());
+
     //     // SWERVE2
     //     NamedCommands.registerCommand("Reset Pose", swerveDrive.resetPoseWithAprilTags(0.2));
 
@@ -99,6 +127,56 @@ public final class Autos {
     //             Commands.waitSeconds(1),
     //             superSystem.stopFlywheel()
     //         ));
-    // }
-    
+    }
+
+    public AutoRoutine TopAuto() {
+
+        AutoRoutine topAuto = autoFactory.newRoutine("topAuto");
+
+        AutoTrajectory first = topAuto.trajectory("Sweep1");
+        AutoTrajectory second = topAuto.trajectory("Sweep2");
+        AutoTrajectory third = topAuto.trajectory("leave");
+
+        topAuto.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(second.cmd())
+        );
+
+
+
+
+        second.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(third.cmd())
+        );
+
+        return topAuto;
+    }
 }

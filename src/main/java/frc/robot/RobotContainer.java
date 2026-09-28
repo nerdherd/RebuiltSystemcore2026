@@ -39,6 +39,7 @@ import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 public class RobotContainer {
   public NerdDrivetrain swerveDrive;
   public PowerDistribution pdp = new PowerDistribution(CANPort.CAN_D0, 1, ModuleType.REV);
+  public Autos autoManager;
   
   public SuperSystem superSystem;
 
@@ -58,11 +59,12 @@ public class RobotContainer {
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
       superSystem.initializeLEDs();
-      // Autos.initNamedCommands(superSystem, swerveDrive);
     }
     
     Subsystems.init();
-    // Autos.initAutoChooser();
+    autoManager = new Autos(superSystem);
+    autoManager.initAutoChooser();
+    autoManager.initNamedCommands();
     initializeLogging();
 
     NerdLog.reportInfo("Initialization Complete");
@@ -94,9 +96,10 @@ public class RobotContainer {
       // Turn
       () -> -driverController.getRightX(), 
       // use turn to angle
-      () -> driverController.getBumperRight(),
+      () -> driverController.getBumperRight() || driverController.getTriggerLeft(),
       // turn to angle target direction, 0.0 to use manual
-      () -> swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset,
+      () -> (driverController.getBumperRight()) ? (swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) + kOffset) :
+              ((IsRedSide()) ? 0.0 : (Math.PI)),
       // robot oriented adjustment (dpad)
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
@@ -108,7 +111,7 @@ public class RobotContainer {
       // tow supplier
       () -> driverController.getBumperLeft(), 
       // precision/programmer mode :)
-      () -> driverController.getTriggerLeftAxis()
+      () -> (driverController.getButtonLeft()) ? 1.0 : 0.0
     );
     
     swerveDrive.setDefaultCommand(swerveJoystickCommand);
@@ -169,34 +172,34 @@ public class RobotContainer {
   // Operator bindings
   //////////////////////
   public void configureOperatorBindings_teleop() {
-
     if (Constants.USE_SUBSYSTEMS) {
       operatorController.controllerLeft()
         .onTrue(superSystem.intakeHoldTeleop());
         // .onFalse(superSystem.stopIntakeHold());
       operatorController.controllerRight()
         .onTrue(superSystem.intakeUp())
-        .onFalse(superSystem.stopIntakeHold());
+        .onFalse(superSystem.stopIntakeSlapdown());
       operatorController.bumperLeft()
         .onTrue(superSystem.intake())
         .onFalse(superSystem.stopIntaking());
       
-
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
         // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
-        // .onTrue(superSystem.spinUpFlywheel())
         .onFalse(superSystem.stopFlywheel());
       operatorController.triggerLeft()
-        .whileTrue(superSystem.spinUpFlywheel())
+        .onTrue(superSystem.setFlywheelCommand(37))
         .onFalse(superSystem.stopFlywheel());
+      operatorController.buttonLeft()
+        .onTrue(superSystem.setFlywheelCommand(45))
+        .onFalse(superSystem.stopFlywheel());
+      operatorController.buttonUp()
+          .whileTrue(superSystem.startFeeding())
+          .onFalse(superSystem.stopFlywheel());
       operatorController.bumperRight()
         .whileTrue(superSystem.shootWithCondition())
-        .onFalse(superSystem.stopShooting());
-        
-      operatorController.buttonUp()
-        .whileTrue(superSystem.spinUpFlywheelFeeding())
-        .onFalse(superSystem.stopFlywheel());
+        .onFalse(superSystem.stopShoot());
+      
       operatorController.buttonRight()
         .onTrue(superSystem.outtake())
         .onFalse(superSystem.stopIntaking());
@@ -204,16 +207,13 @@ public class RobotContainer {
         .onTrue(superSystem.reverseConveyor())
         .onFalse(superSystem.stopConveyor());
       // hood testing
-      operatorController.buttonLeft()
-        .onTrue(superSystem.setShooterCommand(45))
-        .onFalse(superSystem.stopFlywheel());
 
-      operatorController.dpadDown()
-        .onTrue(superSystem.setHood(0.5))
-        .onFalse(superSystem.hoodDown());
       operatorController.dpadUp()
-        .onTrue(superSystem.hoodUp())
-        .onFalse(superSystem.hoodDown());
+        .onTrue(superSystem.hoodUpCommand())
+        .onFalse(superSystem.hoodDownCommand());
+      operatorController.dpadDown()
+        .onTrue(superSystem.setHoodCommand(0.5))
+        .onFalse(superSystem.hoodDownCommand());
      }
   }
 
@@ -238,7 +238,6 @@ public class RobotContainer {
     NerdLog.logBoolean("Robot/Shooting Zone", () -> ZoneConstants.kShootingGroup.check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
     NerdLog.logBoolean("Robot/Passing Zone", () -> ZoneConstants.kLongPass.get().check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
     NerdLog.reportLogCount();
-    NerdLog.reportLogCount();
   }
   
   /**
@@ -247,7 +246,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.getSelected();
+    return Autos.autoChooser.selectedCommand();
   }
 
   public void disableAllMotors_Test() {

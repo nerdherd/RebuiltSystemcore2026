@@ -238,7 +238,6 @@ public class RobotContainer {
     NerdLog.logBoolean("Robot/Shooting Zone", () -> ZoneConstants.kShootingGroup.check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
     NerdLog.logBoolean("Robot/Passing Zone", () -> ZoneConstants.kLongPass.get().check(swerveDrive.getPose()), LOG_LEVEL.MEDIUM);
     NerdLog.reportLogCount();
-    NerdLog.reportLogCount();
   }
   
   /**

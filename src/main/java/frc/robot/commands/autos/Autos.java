@@ -179,16 +179,4 @@ public final class Autos {
 
         return topAuto;
     }
-
-    public Command TopAutoCommand() {
-
-        return Commands.sequence(
-            autoFactory.resetOdometry("Sweep1"), 
-            Commands.parallel(
-                
-            )
-
-        );
-    }
-    
 }

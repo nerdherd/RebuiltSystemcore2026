@@ -44,7 +44,6 @@ import frc.robot.util.Zones.NerdZone;
 import frc.robot.util.Zones.RectangleZone;
 import frc.robot.util.Zones.SemicircleZone;
 import frc.robot.util.Zones.ZoneGroup;
-// import wpi.tunables.TunableRegistry;
 import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 import frc.robot.util.nerd_math.NerdyMath;
 import frc.robot.util.nerd_math.Translation2dSlewRateLimiter;
@@ -88,7 +87,7 @@ public final class Constants {
     public static final double kRotationDeadband = 0.1; // out of 1
     public static final double kTurnToAngleDeadband = 0.5; // out of 1
 
-    public static final double kInputAcceleration = 3.0; // unit/s, on the scale of a unit circle/fractions
+    public static final double kInputAcceleration = 1.0; // unit/s, on the scale of a unit circle/fractions
     public static final double kEasePower = 3.0; // increase to further separate lower and higher values
 
     public static final Translation2dSlewRateLimiter kTranslationInputRateLimiter = new Translation2dSlewRateLimiter(kInputAcceleration);
@@ -663,7 +662,7 @@ public final class Constants {
     public static final boolean useHood = true;
     public static final TemplateSubsystem hood = (!USE_SUBSYSTEMS) ? null :
     new TemplateSubsystem(
-        "Hood", 
+        "Hood",
         HoodConstants.kMotor1ID, 
         SubsystemMode.POSITION, 
         0.0, 

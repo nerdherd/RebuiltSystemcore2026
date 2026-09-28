@@ -256,16 +256,10 @@ public class SuperSystem implements Reportable {
                 shooter.setDesiredValue(45);
         });
     }
-
-    public Command spinUpFlywheel(double speed) {
-        return Commands.parallel(
-            setFlywheelCommand(speed)
-        );
-    }
         
     public Command stopFlywheel() {
         return Commands.parallel(
-            setFlywheelCommand(0.0),
+            shooter.setDesiredValueCommand(0.0),
             setShooterStateCommand(ShooterState.NONE)
         );
     }

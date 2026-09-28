@@ -11,6 +11,7 @@ import static frc.robot.Constants.ControllerConstants.kRotationInputFilter;
 import java.util.function.Supplier;
 
 import org.wpilib.math.controller.PIDController;
+import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.command2.Command;
 import frc.robot.Constants.SwerveDriveConstants;
@@ -18,6 +19,9 @@ import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.util.nerd_math.NerdyMath;
 public class SwerveJoystickCommand extends Command {
     private final NerdDrivetrain swerveDrive;
+    private boolean counterDefense = false;
+    private Pose2d targetPoseSnapshot = new Pose2d();
+    private boolean wasTranslationInDeadband = false;
     private final Supplier<Double> xTranslationInput, yTranslationInput, turnInput, desiredAngle, usePrecisionMode;
     private final Supplier<Translation2d> robotOrientedAdjustment;
     private final Supplier<Boolean> useTurnToAngle, useFieldOriented, useTowMode;
@@ -56,7 +60,6 @@ public class SwerveJoystickCommand extends Command {
         this.desiredAngle = desiredAngleSupplier;
 
         this.robotOrientedAdjustment = robotOrientedAdjustment;
-
         this.useFieldOriented = useFieldOriented;
         this.useTowMode = useTowMode;
         this.usePrecisionMode = usePrecisionMode;
@@ -84,6 +87,17 @@ public class SwerveJoystickCommand extends Command {
         /** m/s */
         Translation2d filteredInput = kTranslationInputFilter.apply(xTranslationInput.get(), yTranslationInput.get());
         double driveMult = NerdyMath.lerp(1.0, kDrivePrecisionMultiplier, usePrecisionMode.get());
+        boolean translationInDeadband = filteredInput.equals(Translation2d.ZERO);
+
+        if (translationInDeadband && !wasTranslationInDeadband) {
+            targetPoseSnapshot = swerveDrive.getPose();
+            counterDefense = true;
+        } else if (!translationInDeadband) {
+            counterDefense = false;
+        }
+
+        wasTranslationInDeadband = translationInDeadband;
+
         double xSpeed = filteredInput.getX() * kDriveMaxVelocity * driveMult;
         double ySpeed = filteredInput.getY() * kDriveMaxVelocity * driveMult;
 
@@ -100,6 +114,7 @@ public class SwerveJoystickCommand extends Command {
         else turnSpeed = kRotationInputFilter.apply(turnInput.get()) * kTurnMaxVelocity * NerdyMath.lerp(1.0, kTurnPrecisionMultiplier, usePrecisionMode.get());
 
         Translation2d adjustment = robotOrientedAdjustment.get();
+        if (counterDefense) {swerveDrive.driveCounterDefense(targetPoseSnapshot, turnSpeed); return;}
         if (!adjustment.equals(Translation2d.ZERO)) swerveDrive.driveRobotOriented(adjustment.getX() * driveMult, adjustment.getY() * driveMult, turnSpeed);
         else if (useFieldOriented.get()) swerveDrive.driveFieldOriented(xSpeed, ySpeed, turnSpeed);
         else swerveDrive.driveRobotOriented(xSpeed, ySpeed, turnSpeed);

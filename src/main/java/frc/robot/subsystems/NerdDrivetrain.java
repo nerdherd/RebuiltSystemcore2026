@@ -148,6 +148,24 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         driveFieldOriented(x, y, r);
     }
 
+    public void driveCounterDefense(Pose2d target, double rSpeed) {
+        double x = kTargetDriveController.calculate("x", getPose().getX(), target.getX());
+        double y = kTargetDriveController.calculate("y", getPose().getY(), target.getY());
+        // log to test
+        DogLog.log("CounterDefense/PIDOutputX", x);
+        DogLog.log("CounterDefense/PIDOutputY", y);
+        DogLog.log("CounterDefense/PIDTargetX", target.getX());
+        DogLog.log("CounterDefense/PIDTargetY", target.getY());
+        double l = Math.sqrt(x*x+y*y);
+            // clamp the velocity
+        x *= Math.min(1.0, kTargetDriveMaxLateralVelocity / l);
+        y *= Math.min(1.0, kTargetDriveMaxLateralVelocity / l);
+        if (kTargetDriveController.atSetpoint("x")) {x = 0.0;}
+        if (kTargetDriveController.atSetpoint("y")) { y = 0.0;}
+        driveFieldOriented(x, y, rSpeed);
+    }
+
+
     /**
      * resets the target drive controller for {@link #driveToTarget(Pose2d)}
      */

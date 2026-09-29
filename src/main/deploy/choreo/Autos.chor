@@ -4,22 +4,7 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{
-   "BotShoot":{
-    "x":{
-     "exp":"3.3151867389678955 m",
-     "val":3.3151867389678955
-    },
-    "y":{
-     "exp":"2.6498749256134033 m",
-     "val":2.6498749256134033
-    },
-    "heading":{
-     "exp":"0.8 rad",
-     "val":0.8
-    }
-   }
-  }
+  "poses":{}
  },
  "config":{
   "frontLeft":{

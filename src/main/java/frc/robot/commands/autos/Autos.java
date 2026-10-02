@@ -22,7 +22,8 @@ public final class Autos {
     public void initAutoChooser() {
 
 
-        autoChooser.addRoutine("Top 2.5 w Distance", this::TopAuto);
+        autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweep);
+        autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
 
 
             
@@ -129,7 +130,58 @@ public final class Autos {
     //         ));
     }
 
-    public AutoRoutine TopAuto() {
+    public AutoRoutine TopDoubleSweep() {
+
+        AutoRoutine topDoubleSweep = autoFactory.newRoutine("topDoubleSweep");
+
+        AutoTrajectory first = topDoubleSweep.trajectory("TopSweep1");
+        AutoTrajectory second = topDoubleSweep.trajectory("TopSweep2");
+        AutoTrajectory third = topDoubleSweep.trajectory("TopLeave");
+
+        topDoubleSweep.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(second.cmd())
+        );
+
+
+
+
+        second.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(third.cmd())
+        );
+
+        return topDoubleSweep;
+    }
+
+    public AutoRoutine BottomAuto() {
 
         AutoRoutine topAuto = autoFactory.newRoutine("topAuto");
 
@@ -179,4 +231,57 @@ public final class Autos {
 
         return topAuto;
     }
+
+    public AutoRoutine BottomDoubleSweep() {
+
+        AutoRoutine bottomDoubleSweep = autoFactory.newRoutine("bottomDoubleSweep");
+
+        AutoTrajectory first = bottomDoubleSweep.trajectory("BottomSweep1");
+        AutoTrajectory second = bottomDoubleSweep.trajectory("BottomSweep2");
+        AutoTrajectory third = bottomDoubleSweep.trajectory("BottomLeave");
+
+        bottomDoubleSweep.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(second.cmd())
+        );
+
+
+
+
+        second.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(third.cmd())
+        );
+
+        return bottomDoubleSweep;
+    }
+
+    
 }

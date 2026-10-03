@@ -23,6 +23,7 @@ public final class Autos {
         autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweep);
         autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
         autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
+        autoChooser.addRoutine("Middle Depot", this::Depot);
 
 
             
@@ -287,4 +288,36 @@ public final class Autos {
 
         return topBumpTripleSweep;
     }
+
+    public AutoRoutine Depot() {
+
+        AutoRoutine depot = autoFactory.newRoutine("depot");
+
+        AutoTrajectory first = depot.trajectory("Depot");
+
+        depot.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            )
+        );
+
+        return depot;
+    }
+
 }

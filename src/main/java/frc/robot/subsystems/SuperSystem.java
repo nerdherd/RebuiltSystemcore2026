@@ -135,7 +135,7 @@ public class SuperSystem implements Reportable {
         }
     }
 
-    public Command stopShoot() {
+    public Command stopShootCommand() {
         return Commands.parallel(
             indexer.setDesiredValueCommand(0),
             conveyor.setDesiredValueCommand(0),
@@ -191,6 +191,16 @@ public class SuperSystem implements Reportable {
     public Command stopShootWithDistance() {
         return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoShootWithDistance));
     }
+
+    public Command autoHoodShootWithDistance = shootWithDistance().finallyDo(() -> {shooter.setDesiredValue(0.0);});
+    
+    public Command startHoodShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().schedule(autoHoodShootWithDistance));
+    }
+
+    public Command stopHoodShootWithDistance() {
+        return Commands.runOnce(() -> CommandScheduler.getInstance().cancel(autoHoodShootWithDistance));
+    }
     
     public Command autoShootWithDistance() {
         return Commands.run(
@@ -242,7 +252,7 @@ public class SuperSystem implements Reportable {
     public Command setFlywheelCommand(double speed) {
         return Commands.either(
             shooter.setDesiredValueCommand(speed),
-            stopFlywheel(),
+            stopFlywheelCommand(),
             () -> speed != 0.0);
     }
 
@@ -257,7 +267,7 @@ public class SuperSystem implements Reportable {
         });
     }
         
-    public Command stopFlywheel() {
+    public Command stopFlywheelCommand() {
         return Commands.parallel(
             shooter.setDesiredValueCommand(0.0),
             setShooterStateCommand(ShooterState.NONE)

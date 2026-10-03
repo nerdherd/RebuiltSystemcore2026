@@ -39,7 +39,6 @@ import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 public class RobotContainer {
   public NerdDrivetrain swerveDrive;
   public PowerDistribution pdp = new PowerDistribution(CANPort.CAN_D0, 1, ModuleType.REV);
-  public Autos autoManager;
   
   public SuperSystem superSystem;
 
@@ -59,12 +58,12 @@ public class RobotContainer {
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
       superSystem.initializeLEDs();
+      Autos.initNamedCommands(superSystem, swerveDrive);
     }
     
     Subsystems.init();
-    autoManager = new Autos(superSystem);
-    autoManager.initAutoChooser();
-    autoManager.initNamedCommands();
+    Autos.initAutoChooser();
+    
     initializeLogging();
 
     NerdLog.reportInfo("Initialization Complete");
@@ -186,19 +185,19 @@ public class RobotContainer {
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
         // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
-        .onFalse(superSystem.stopFlywheel());
+        .onFalse(superSystem.stopFlywheelCommand());
       operatorController.triggerLeft()
         .onTrue(superSystem.setFlywheelCommand(37))
-        .onFalse(superSystem.stopFlywheel());
+        .onFalse(superSystem.stopFlywheelCommand());
       operatorController.buttonLeft()
         .onTrue(superSystem.setFlywheelCommand(45))
-        .onFalse(superSystem.stopFlywheel());
+        .onFalse(superSystem.stopFlywheelCommand());
       operatorController.buttonUp()
           .whileTrue(superSystem.startFeeding())
-          .onFalse(superSystem.stopFlywheel());
+          .onFalse(superSystem.stopFlywheelCommand());
       operatorController.bumperRight()
         .whileTrue(superSystem.shootWithCondition())
-        .onFalse(superSystem.stopShoot());
+        .onFalse(superSystem.stopShootCommand());
       
       operatorController.buttonRight()
         .onTrue(superSystem.outtake())
@@ -246,7 +245,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.selectedCommand();
+    return Autos.autoChooser.getSelected();
   }
 
   public void disableAllMotors_Test() {

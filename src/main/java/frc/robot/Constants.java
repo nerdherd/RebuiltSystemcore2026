@@ -30,6 +30,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.config.PIDConstants;
 
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -187,7 +188,7 @@ public final class Constants {
     public static final MultiProfiledPIDController kTargetDriveController = new MultiProfiledPIDController()
       .add("x", kTargetDriveLateralPID, kTargetDriveLateralConstraints, 0.1, 0.1)
       .add("y", kTargetDriveLateralPID, kTargetDriveLateralConstraints, 0.1, 0.1)
-      .add("r", kTargetDriveLateralPID, kTargetDriveRotationalConstraints, 0.05, 0.2)
+      .add("r", kTargetDriveRotationalPID, kTargetDriveRotationalConstraints, 0.05, 0.2)
       .withContinuousInput("r", -Math.PI, Math.PI);
 
     public static enum FieldPositions {
@@ -221,13 +222,13 @@ public final class Constants {
     public static final double kPP_I = 0.0;
     public static final double kPP_D = 0.0;
 
-    public static final NerdPIDConstants kPPTranslationPIDConstants = new NerdPIDConstants(kPP_P, kPP_I, kPP_D);
+    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(kPP_P, kPP_I, kPP_D);
 
     public static final double kPP_ThetaP = 4.0; //3
     public static final double kPP_ThetaI = 0;
     public static final double kPP_ThetaD = 0.1;
 
-    public static final NerdPIDConstants kPPRotationPIDConstants = new NerdPIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
   }
 
   public static final class LoggingConstants {

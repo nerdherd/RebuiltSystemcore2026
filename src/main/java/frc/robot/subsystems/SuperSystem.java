@@ -14,7 +14,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.networktables.DoubleSubscriber;
+import org.wpilib.tunable.TunableDouble;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -220,12 +220,12 @@ public class SuperSystem implements Reportable {
                     rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
                 }
                 // spin up flywheel
-                shooter.setDesiredValue(Math.min(55.0, rps));
+                shooter.setDesiredValue(Math.min(55.0, Math.max(0.0, rps)));
             }, shooter);
     }
 
     public double shootSpeed = 0;
-    public DoubleSubscriber shootSpeedSub = null;
+    public TunableDouble shootSpeedSub = null;
     /**
      * change shootSpeed using elastic, always defaults to 0 when 
      * the code is reloaded so save the value

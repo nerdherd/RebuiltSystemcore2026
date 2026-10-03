@@ -44,8 +44,8 @@ public class Controller {
     public Trigger dpadLeft()           { return gamepad.dpadLeft();     }
     public Trigger joystickLeft()       { return gamepad.leftStick();    }
     public Trigger joystickRight()      { return gamepad.rightStick();   }
-    public Trigger controllerLeft()     { return gamepad.back();        } // TODO: this is probably wrong
-    public Trigger controllerRight()    { return gamepad.start();        } // TODO: this is probably wrong
+    public Trigger controllerLeft()     { return gamepad.back();        } 
+    public Trigger controllerRight()    { return gamepad.start();        } 
 
     public double getLeftX()            { return gamepad.getLeftX();  }
     public double getLeftY()            { return gamepad.getLeftY();  }

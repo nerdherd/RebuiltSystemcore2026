@@ -2,6 +2,8 @@ package frc.robot.commands.autos;
 
 import org.wpilib.tunable.Tunables;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import org.wpilib.command2.Commands;
 import frc.robot.subsystems.SuperSystem;
 import choreo.auto.AutoChooser;
@@ -25,36 +27,33 @@ public final class Autos {
         autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
         autoChooser.addRoutine("Middle Depot", this::Depot);
 
+        NamedCommands.registerCommand("Intake Down", superSystem.intakeDownAuto());
+        NamedCommands.registerCommand("Intake Down Only", superSystem.intakeDownOnlyAuto());
+        NamedCommands.registerCommand("Intake Hold", superSystem.intakeHoldAuto());
+        // NamedCommands.registerCommand("Intake Up", superSystem.intakeUp());
+        NamedCommands.registerCommand("Intake Start", superSystem.intake());
+        NamedCommands.registerCommand("Intake Stop", superSystem.stopIntaking());
 
-            
-    //     autoChooser.setDefaultOption("Do Nothing", Commands.none());
-        
-    //     // autoChooser.addOption("Test", AutoBuilder.buildAuto("test"));
+        NamedCommands.registerCommand("Intake Down Sequence", 
+            Commands.sequence(
+                superSystem.intakeDownAuto(),
+                superSystem.intake()
+            ));
+        NamedCommands.registerCommand("Auto Shoot Start", superSystem.startShootWithCondition());
+        NamedCommands.registerCommand("Auto Shoot Stop", superSystem.stopShootWithCondition());
+        // NamedCommands.registerCommand("Intake Up Sequence", 
+        //     Commands.sequence(
+        //         superSystem.stopIntaking(), 
+        //         superSystem.intakeUp()
+        //     ));
 
-    //     // EXAMPLE
-    //     // autoChooser.addOption("Auto Name", AutoBuilder.buildAuto("PathPlanner Auto Name"));
-
-    //     // TOP
-    //     // autoChooser.addOption("Top-S1Neutral2.5", AutoBuilder.buildAuto("Top-S1Neutral2.5"));
-    //     autoChooser.addOption("Top-S1Neutral2.5 w Distance", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Distance"));
-    //     autoChooser.addOption("trench", AutoBuilder.buildAuto("trench"));
-
-    //     // autoChooser.addOption("Top-S1Neutral3", AutoBuilder.buildAuto("Top-S1Neutral3"));
-    //     // autoChooser.addOption("Top-S1MidDepot", AutoBuilder.buildAuto("Top-S1MidDepot"));
-
-    //     // MID
-    //     // autoChooser.addOption("Mid-S3DepotTower", AutoBuilder.buildAuto("Mid-S3DepotTower"));
-    //     // autoChooser.addOption("Mid-S3DepotTower2", AutoBuilder.buildAuto("Mid-S3DepotTower2"));
-
-
-    //     // BOT
-    //     // autoChooser.addOption("Bot-S5Neutral2.5", AutoBuilder.buildAuto("Bot-S5Neutral2.5"));
-    //     autoChooser.addOption("Bot-S5Neutral2.5 w Distance", AutoBuilder.buildAuto("Bot-S5Neutral2.5 w Distance"));
-
-
-    //     // TEST
-    //     // autoChooser.addOption("Top-S1Trench2.5", AutoBuilder.buildAuto("Top-S1Trench2.5"));
-    //     // autoChooser.addOption("Bot-S5Trench2.5", AutoBuilder.buildAuto("Bot-S5Trench2.5"));
+        // SHOOTER
+        NamedCommands.registerCommand("Flywheel Start", superSystem.shootWithDistance());
+        NamedCommands.registerCommand("Flywheel Start Distance", superSystem.startShootWithDistance());
+        NamedCommands.registerCommand("Flywheel Stop Distance", superSystem.stopShootWithDistance());
+        NamedCommands.registerCommand("Flywheel Stop", superSystem.stopFlywheel());
+        NamedCommands.registerCommand("Turn to Hub", superSystem.turnToHub(3.0));
+        NamedCommands.registerCommand("Shoot Distance", superSystem.shootWithDistance());
 
         Tunables.publish("Autos/Chooser", autoChooser);
 

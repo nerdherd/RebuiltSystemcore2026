@@ -38,6 +38,7 @@ public final class Autos {
 
         autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweep);
         autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
+        autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
 
 
             
@@ -152,9 +153,6 @@ public final class Autos {
             ).andThen(second.cmd())
         );
 
-
-
-
         second.done().onTrue(
             Commands.sequence(
                 Commands.parallel(
@@ -202,9 +200,6 @@ public final class Autos {
                 )
             ).andThen(second.cmd())
         );
-
-
-
 
         second.done().onTrue(
             Commands.sequence(
@@ -275,5 +270,69 @@ public final class Autos {
         return bottomDoubleSweep;
     }
 
-    
+        public AutoRoutine TopBumpTripleSweep() {
+
+        AutoRoutine topBumpTripleSweep = autoFactory.newRoutine("topBumpTripleSweep");
+
+        AutoTrajectory first = topBumpTripleSweep.trajectory("TopS1Top3Bump_1");
+        AutoTrajectory second = topBumpTripleSweep.trajectory("TopS1Top3Bump_2");
+        AutoTrajectory third = topBumpTripleSweep.trajectory("TopS1Top3Bump_3");
+
+        topBumpTripleSweep.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(second.cmd())
+        );
+
+
+
+
+        second.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.3), // TODO: test value
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.7), // TODO test value
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(third.cmd())
+        );
+
+        third.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            )
+        );
+
+        return topBumpTripleSweep;
+    }
 }

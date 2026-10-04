@@ -123,6 +123,56 @@ public final class Autos {
         return topDoubleSweep;
     }
 
+    public AutoRoutine TopDoubleSweepDelayed() {
+
+        AutoRoutine topDoubleSweepDelayed = autoFactory.newRoutine("topDoubleSweepDelayed");
+
+        AutoTrajectory first = topDoubleSweepDelayed.trajectory("TopSweep1Delayed");
+        AutoTrajectory second = topDoubleSweepDelayed.trajectory("TopSweep2Delayed");
+        AutoTrajectory third = topDoubleSweepDelayed.trajectory("TopLeaveDelayed");
+
+        topDoubleSweepDelayed.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.waitSeconds(3),
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(second.cmd())
+        );
+
+        second.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            ).andThen(third.cmd())
+        );
+
+        return topDoubleSweepDelayed;
+    }
+
+
     public AutoRoutine BottomAuto() {
 
         AutoRoutine topAuto = autoFactory.newRoutine("topAuto");

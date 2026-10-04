@@ -58,15 +58,15 @@ public class RobotContainer {
     
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
-      superSystem.initializeLEDs();
     }
     
     Subsystems.init();
-    autoManager = new Autos(superSystem);
-    autoManager.initAutoChooser();
-    autoManager.initNamedCommands();
-    initializeLogging();
 
+    autoManager = new Autos(superSystem);
+    autoManager.initBindings();
+    autoManager.initAutoChooser();
+
+    initializeLogging();
     NerdLog.reportInfo("Initialization Complete");
   }
 

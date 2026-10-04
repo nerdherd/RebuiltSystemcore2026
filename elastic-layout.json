@@ -8,19 +8,6 @@
         "layouts": [],
         "containers": [
           {
-            "title": "Selected Auto",
-            "x": 0.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Dropdown Chooser",
-            "properties": {
-              "topic": "/SmartDashboard/Autos/Selected Auto",
-              "period": 0.06,
-              "sort_options": false
-            }
-          },
-          {
             "title": "BatteryVoltage",
             "x": 0.0,
             "y": 512.0,
@@ -53,18 +40,6 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
-            }
-          },
-          {
-            "title": "Alerts",
-            "x": 256.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Alerts",
-            "properties": {
-              "topic": "/SmartDashboard/Alerts",
-              "period": 0.06
             }
           },
           {
@@ -531,6 +506,31 @@
               "robot_color": 4294198070,
               "trajectory_color": 4294967295,
               "show_robot_outside_widget": true
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 256.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/Telemetry/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Chooser",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Dropdown Chooser",
+            "properties": {
+              "topic": "/Tunables/Autos/Chooser",
+              "period": 0.06,
+              "sort_options": false
             }
           }
         ]

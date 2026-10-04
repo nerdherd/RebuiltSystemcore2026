@@ -22,7 +22,6 @@ import dev.doglog.DogLog;
 
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.linalg.VecBuilder;
-import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
@@ -36,6 +35,7 @@ import org.wpilib.command2.Commands;
 import org.wpilib.command2.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.ChoreoConstants;
 import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
 import frc.robot.Constants.VisionConstants.Camera;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
@@ -49,44 +49,10 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
     public final Field2d field;
     public boolean useMegaTag2 = false;
 
-    private final PIDController xController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController yController = new PIDController(10.0, 0.0, 0.0);
-    private final PIDController headingController = new PIDController(7.5, 0.0, 0.0);
-    
     public NerdDrivetrain(SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
 
-        headingController.enableContinuousInput(-Math.PI, Math.PI);
-
-        // RobotConfig robotConfig = null;
-        // try {
-        //     robotConfig = RobotConfig.fromGUISettings();
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        // }
-
-        // AutoBuilder.configure(
-        //     this::getPose,
-        //     this::resetPose,
-        //     this::getChassisVelocities,
-        //     (speeds, feedforwards) -> setControl(
-        //         kApplyRobotSpeedsRequest.withVelocity(speeds)
-        //             .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-        //             .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-        //         ),
-        //     new PPHolonomicDriveController(
-        //         kPPTranslationPIDConstants, 
-        //         kPPRotationPIDConstants),  
-        //     robotConfig,
-        //     () -> {
-        //         var alliance = MatchState.getAlliance();
-        //         return alliance.isPresent() ? (alliance.get() == Alliance.RED) : false;
-        //     },
-        //     this
-        // );
-
         field = new Field2d();
-
         setVision(USE_VISION);
     }
     
@@ -172,9 +138,9 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
 
         // Generate the next velocities for the robot
         ChassisVelocities velocities = new ChassisVelocities(
-            sample.vx + xController.calculate(pose.getX(), sample.x),
-            sample.vy + yController.calculate(pose.getY(), sample.y),
-            sample.omega + headingController.calculate(pose.getRotation().getRadians(), sample.heading)
+            sample.vx + ChoreoConstants.kXController.calculate(pose.getX(), sample.x),
+            sample.vy + ChoreoConstants.kYController.calculate(pose.getY(), sample.y),
+            sample.omega + ChoreoConstants.kRController.calculate(pose.getRotation().getRadians(), sample.heading)
         );
 
         // Apply the generated velocities

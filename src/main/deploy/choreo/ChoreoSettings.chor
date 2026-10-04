@@ -1,25 +1,10 @@
 {
- "name":"Top-S1Top3Bump",
+ "name":"ChoreoSettings",
  "version":2,
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{
-   "endS1":{
-    "x":{
-     "exp":"3.3238298892974854 m",
-     "val":3.323829889297486
-    },
-    "y":{
-     "exp":"5.547545909881592 m",
-     "val":5.547545909881592
-    },
-    "heading":{
-     "exp":"0 rad",
-     "val":0.0
-    }
-   }
-  }
+  "poses":{}
  },
  "config":{
   "frontLeft":{
@@ -91,7 +76,7 @@
  },
  "generationFeatures":[],
  "codegen":{
-  "root":"../C:/Users/nerdherd/Documents/GitHub/RebuiltSystemcore2026/src/main/deploy/choreo",
+  "root":"../C:/Users/Mason/Documents/GitHub/RebuiltSystemcore2026/src/main/deploy/choreo",
   "genVars":true,
   "genTrajData":true,
   "useChoreoLib":true

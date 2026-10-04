@@ -31,6 +31,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 
+import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -216,18 +217,14 @@ public final class Constants {
     public static final double kRobotRotationOffset = Math.PI; // rad
   }
 
-  public static final class PathPlannerConstants {
-    public static final double kPP_P = 5.0; //6
-    public static final double kPP_I = 0.0;
-    public static final double kPP_D = 0.0;
+  public static final class ChoreoConstants {
+    private final static NerdPIDConstants kXControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kYControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kRControllerConstants = new NerdPIDConstants(7.5, 10.0, 0).enableContinuousInput(-Math.PI, Math.PI);
 
-    public static final NerdPIDConstants kPPTranslationPIDConstants = new NerdPIDConstants(kPP_P, kPP_I, kPP_D);
-
-    public static final double kPP_ThetaP = 4.0; //3
-    public static final double kPP_ThetaI = 0;
-    public static final double kPP_ThetaD = 0.1;
-
-    public static final NerdPIDConstants kPPRotationPIDConstants = new NerdPIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public final static PIDController kXController = kXControllerConstants.getController();
+    public final static PIDController kYController = kYControllerConstants.getController();
+    public final static PIDController kRController = kRControllerConstants.getController();
   }
 
   public static final class LoggingConstants {

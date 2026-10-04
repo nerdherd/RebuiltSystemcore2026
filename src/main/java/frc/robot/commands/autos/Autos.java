@@ -28,10 +28,10 @@ public final class Autos {
 
     public void initAutoChooser() {
         autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweep);
-        autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweepDelayed);
-        autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
-        autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
-        autoChooser.addRoutine("Middle Depot", this::Depot);
+        // autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweepDelayed);
+        // autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
+        // autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
+        // autoChooser.addRoutine("Middle Depot", this::Depot);
 
         Tunables.publish("Autos/Chooser", autoChooser);
     }
@@ -214,7 +214,14 @@ public final class Autos {
         topDoubleSweep.active().onTrue(
             Commands.sequence(
                 first.resetOdometry(),
-                first.cmd()
+                Commands.parallel(
+                    Commands.sequence(
+                        Commands.waitSeconds(0.4),
+                        first.cmd()
+                    ), 
+                    Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.25), superSystem.intakeHoldAuto())
+
+                )
             )
         );
 

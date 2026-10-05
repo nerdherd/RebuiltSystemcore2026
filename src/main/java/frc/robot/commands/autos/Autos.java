@@ -31,7 +31,7 @@ public final class Autos {
         // autoChooser.addRoutine("Top 2.5 w Distance", this::TopDoubleSweepDelayed);
         // autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
         // autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
-        // autoChooser.addRoutine("Middle Depot", this::Depot);
+        autoChooser.addRoutine("Middle Depot", this::Depot);
 
         Tunables.publish("Autos/Chooser", autoChooser);
     }

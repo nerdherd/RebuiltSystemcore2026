@@ -49,7 +49,7 @@ public class TemplateSubsystem extends SubsystemBase implements Reportable {
 	protected TalonFXConfiguration configuration;
 
 	/** position controller for {@link SubsystemMode#POSITION} */
-	private MotionMagicVoltage positionController = null;
+	public MotionMagicVoltage positionController = null;
 	/** velocity controller for {@link SubsystemMode#VELOCITY} */
 	private VelocityVoltage velocityController = null;
 	/** voltage controller for {@link SubsystemMode#VOLTAGE} */

@@ -140,7 +140,7 @@ public final class Constants {
     ///////////////////////////
     
     public static final double kTurnToAngleMaxVelocity = 7.00; // rad/s
-    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.5);
+    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.35);
     public static final Constraints kTurnToAngleTolerances = new Constraints(0.017, 0.05); 
 
     ////////////////////////////////////////////
@@ -374,8 +374,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.120461)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.327567);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.116428)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.361916);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()

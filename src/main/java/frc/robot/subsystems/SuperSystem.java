@@ -46,12 +46,11 @@ public class SuperSystem implements Reportable {
     
     public Command autoTurnToHub = null;
     public Command turnToHub(double timeout) {
-        if (autoTurnToHub == null) 
-            autoTurnToHub = new SwerveJoystickCommand(swerveDrivetrain, () -> 0.0, () -> 0.0, () -> 0.0, () -> true, 
+        return autoTurnToHub = new SwerveJoystickCommand(swerveDrivetrain, () -> 0.0, () -> 0.0, () -> 0.0, () -> true, 
                 () -> swerveDrivetrain.angleToPose(FieldPositions.HUB_CENTER) + RobotContainer.kOffset, 
-                () -> Translation2d.ZERO, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0));
+                () -> Translation2d.ZERO, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0))
+                    .raceWith(Commands.waitSeconds(timeout));
 
-        return autoTurnToHub.raceWith(Commands.waitSeconds(timeout));
     }
 
     // ---------------------------------++ SUBSYSTEMS ++--------------------------------- //
@@ -127,8 +126,13 @@ public class SuperSystem implements Reportable {
                 else setHood(0.0);
                 break;
             case PASSING:
-                if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) setHood(1.0);
-                else setHood(0.0);
+                if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
+                    setHood(1.0);
+                    hood.positionController.FeedForward = 2.0;
+                } else {
+                    setHood(1.0);
+                    hood.positionController.FeedForward = 0.0;
+                }
                 break;
             case NONE:
             default: setHood(0.0); break;
@@ -139,7 +143,8 @@ public class SuperSystem implements Reportable {
         return Commands.parallel(
             indexer.setDesiredValueCommand(0),
             conveyor.setDesiredValueCommand(0),
-            hoodDownCommand()
+            hoodDownCommand(),
+            Commands.runOnce(() -> hood.positionController.FeedForward = 0.0)
         );
     }
 

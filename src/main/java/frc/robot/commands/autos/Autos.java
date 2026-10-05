@@ -32,6 +32,7 @@ public final class Autos {
         // autoChooser.addRoutine("Bottom 2.5 w Distance", this::BottomDoubleSweep);
         // autoChooser.addRoutine("Top 3 Bump w Distance", this::TopBumpTripleSweep);
         autoChooser.addRoutine("Middle Depot", this::Depot);
+        autoChooser.addRoutine("Middle Outpost", this::Outpost);
 
         Tunables.publish("Autos/Chooser", autoChooser);
     }
@@ -311,5 +312,34 @@ public final class Autos {
         return bottomDoubleSweep;
     }
 
+        public AutoRoutine Outpost() {
 
+        AutoRoutine outpost = autoFactory.newRoutine("Outpost");
+
+        AutoTrajectory first = outpost.trajectory("Outpost");
+
+        outpost.active().onTrue(
+            Commands.sequence(
+                first.resetOdometry(),
+                first.cmd()
+            )
+        );
+
+        first.done().onTrue(
+            Commands.sequence(
+                Commands.parallel(
+                    superSystem.turnToHub(0.7),
+                    Commands.sequence(
+                        Commands.waitSeconds(0.7),
+                        superSystem.startShootCommand(),
+                        Commands.waitSeconds(2.3),
+                        superSystem.setFlywheelCommand(0),
+                        superSystem.stopConveyor()  
+                    )
+                )
+            )
+        );
+
+        return outpost;
+    }
 }

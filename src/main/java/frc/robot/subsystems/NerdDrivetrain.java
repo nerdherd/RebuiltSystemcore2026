@@ -16,8 +16,10 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import choreo.trajectory.SwerveSample;
 import dev.doglog.DogLog;
 
 import org.wpilib.math.util.MathUtil;
@@ -26,6 +28,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.telemetry.TelemetryLoggable;
@@ -35,7 +39,6 @@ import org.wpilib.command2.Commands;
 import org.wpilib.command2.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.ChoreoConstants;
 import frc.robot.Constants.SwerveDriveConstants.FieldPositions;
 import frc.robot.Constants.VisionConstants.Camera;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
@@ -44,6 +47,8 @@ import frc.robot.util.nerd_logging.Reportable;
 import frc.robot.util.nerd_math.NerdyMath;
 import frc.robot.vision.LimelightHelpers;
 import frc.robot.vision.LimelightHelpers.PoseEstimate;
+import frc.robot.Constants.PathPlannerConstants;
+import frc.robot.Constants.SwerveDriveConstants;
 
 public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, Reportable, TelemetryLoggable {
     public final Field2d field;
@@ -51,6 +56,35 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
 
     public NerdDrivetrain(SwerveDrivetrainConstants drivetrainConstants, SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
+
+        RobotConfig robotConfig = null;
+        try {
+            robotConfig = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        AutoBuilder.configure(
+            this::getPose,
+            this::resetPose,
+            this::getChassisVelocities,
+            (speeds, feedforwards) -> setControl(
+                SwerveDriveConstants.kApplyRobotSpeedsRequest.withVelocity(speeds)
+                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                ),
+            new PPHolonomicDriveController(
+                PathPlannerConstants.kPPTranslationPIDConstants,
+                PathPlannerConstants.kPPRotationPIDConstants
+            ),
+            robotConfig,
+            () -> {
+                var alliance = MatchState.getAlliance();
+                return alliance.isPresent() ? (alliance.get() == Alliance.RED) : false;
+            },
+            this
+        );
+
 
         field = new Field2d();
         setVision(USE_VISION);
@@ -130,21 +164,6 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         kTargetDriveController.reset("x", getPose().getX(), getFieldOrientedVelocities().vx * 0.1);
         kTargetDriveController.reset("y", getPose().getY(), getFieldOrientedVelocities().vy * 0.1);
         kTargetDriveController.reset("r", getSwerveHeadingRadians(), getFieldOrientedVelocities().omega * 0.1);
-    }
-
-     public void followTrajectory(SwerveSample sample) {
-        // Get the current pose of the robot
-        Pose2d pose = getPose();
-
-        // Generate the next velocities for the robot
-        ChassisVelocities velocities = new ChassisVelocities(
-            sample.vx + ChoreoConstants.kXController.calculate(pose.getX(), sample.x),
-            sample.vy + ChoreoConstants.kYController.calculate(pose.getY(), sample.y),
-            sample.omega + ChoreoConstants.kRController.calculate(pose.getRotation().getRadians(), sample.heading)
-        );
-
-        // Apply the generated velocities
-        driveFieldOriented(velocities.vx, velocities.vy, velocities.omega);
     }
 
     // ----------------------------------------- Helper Functions ----------------------------------------- //

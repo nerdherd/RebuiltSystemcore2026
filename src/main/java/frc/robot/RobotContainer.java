@@ -62,9 +62,8 @@ public class RobotContainer {
     
     Subsystems.init();
 
-    autoManager = new Autos(superSystem);
-    autoManager.initBindings();
-    autoManager.initAutoChooser();
+    Autos.initBindings(superSystem);
+    Autos.initAutoChooser();
 
     initializeLogging();
     NerdLog.reportInfo("Initialization Complete");
@@ -246,7 +245,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.selectedCommand();
+    return Autos.autoChooser.getSelected();
   }
 
   public void disableAllMotors_Test() {

@@ -30,6 +30,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.config.PIDConstants;
 
 import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.geometry.Pose2d;
@@ -148,7 +149,7 @@ public final class Constants {
     ////////////////////////////////////////////
 
     /** Used for AutoBuilder configuration */
-    public static final SwerveRequest.ApplyRobotVelocity  kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
+    public static final SwerveRequest.ApplyRobotVelocity kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
     /** Robot oriented controller */
     public static final SwerveRequest.RobotCentric      kRobotOrientedSwerveRequest = 
       new SwerveRequest.RobotCentric()
@@ -225,6 +226,20 @@ public final class Constants {
     public final static PIDController kXController = kXControllerConstants.getController();
     public final static PIDController kYController = kYControllerConstants.getController();
     public final static PIDController kRController = kRControllerConstants.getController();
+  }
+
+  public static final class PathPlannerConstants {
+    public static final double kPP_P = 5.0; //6
+    public static final double kPP_I = 0.0;
+    public static final double kPP_D = 0.0;
+
+    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(kPP_P, kPP_I, kPP_D);
+
+    public static final double kPP_ThetaP = 5.0; //3
+    public static final double kPP_ThetaI = 0;
+    public static final double kPP_ThetaD = 0.0;
+
+    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
   }
 
   public static final class LoggingConstants {

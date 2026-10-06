@@ -417,8 +417,8 @@ public final class Constants {
     public static final double kShootWithDistanceA = 0.84;  //<- these are chezy values, these are yesterday's values -> 0.88; // a
     public static final double kShootWithDistanceB = 31.0; // b 31.60409
 
-    public static final double kShootWithDistanceHoodA = 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
-    public static final double kShootWithDistanceHoodB = 35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
+    public static final double kShootWithDistanceHoodA = .678927;// 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
+    public static final double kShootWithDistanceHoodB = 31.914122; //35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
 
     public static final double kLookAheadRingDriveFactor = 0.3; // use to tune the ring drive
     public static final double kLookAheadFactor = 1.35; // use to tune shoot on the move left and right

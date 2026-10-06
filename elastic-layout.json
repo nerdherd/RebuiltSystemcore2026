@@ -8,24 +8,6 @@
         "layouts": [],
         "containers": [
           {
-            "title": "BatteryVoltage",
-            "x": 0.0,
-            "y": 512.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Voltage View",
-            "properties": {
-              "topic": "/Robot/SystemStats/BatteryVoltage",
-              "period": 0.033,
-              "data_type": "double",
-              "min_value": 4.0,
-              "max_value": 13.0,
-              "divisions": 5,
-              "inverted": false,
-              "orientation": "horizontal"
-            }
-          },
-          {
             "title": "Connected",
             "x": 768.0,
             "y": 384.0,
@@ -33,7 +15,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/RadioStatus/Connected",
+              "topic": "/Telemetry/RadioStatus/Connected",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -50,7 +32,7 @@
             "height": 256.0,
             "type": "Match Time",
             "properties": {
-              "topic": "/Robot/Match Info/Shift Time",
+              "topic": "/Telemetry/Match Info/Shift Time",
               "period": 0.06,
               "data_type": "double",
               "time_display_mode": "Seconds Only",
@@ -66,7 +48,7 @@
             "height": 128.0,
             "type": "Large Text Display",
             "properties": {
-              "topic": "/Robot/Match Info/Shift Name",
+              "topic": "/Telemetry/Match Info/Shift Name",
               "period": 0.06,
               "data_type": "string"
             }
@@ -91,7 +73,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/Match Info/Won Auto?",
+              "topic": "/Telemetry/Match Info/Won Auto?",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -108,7 +90,7 @@
             "height": 128.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "Robot/SwerveDrive/Using MT2",
+              "topic": "/Telemetry/SwerveDrive/Using MT2",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -151,7 +133,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Drive 0",
+              "topic": "/Telemetry/SwerveDrive/Connected/Drive 0",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -168,7 +150,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Drive 1",
+              "topic": "/Telemetry/SwerveDrive/Connected/Drive 1",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -185,7 +167,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Drive 2",
+              "topic": "/Telemetry/SwerveDrive/Connected/Drive 2",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -202,7 +184,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Drive 3",
+              "topic": "/Telemetry/SwerveDrive/Connected/Drive 3",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -219,7 +201,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Turn 0",
+              "topic": "/Telemetry/SwerveDrive/Connected/Turn 0",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -236,7 +218,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Turn 1",
+              "topic": "/Telemetry/SwerveDrive/Connected/Turn 1",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -253,7 +235,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Turn 2",
+              "topic": "/Telemetry/SwerveDrive/Connected/Turn 2",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -270,7 +252,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SwerveDrive/Connected/Turn 3",
+              "topic": "/Telemetry/SwerveDrive/Connected/Turn 3",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -287,7 +269,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Shooter/Connected/Primary Motor",
+              "topic": "/Telemetry/SuperSystem/Shooter/Connected/Primary Motor",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -304,7 +286,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Shooter/Connected/Secondary Motor 0",
+              "topic": "/Telemetry/SuperSystem/Shooter/Connected/Secondary Motor 0",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -321,7 +303,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Shooter/Connected/Secondary Motor 1",
+              "topic": "/Telemetry/SuperSystem/Shooter/Connected/Secondary Motor 1",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -338,7 +320,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Shooter/Connected/Secondary Motor 2",
+              "topic": "/Telemetry/SuperSystem/Shooter/Connected/Secondary Motor 2",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -355,7 +337,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Intake Slapdown/Connected/Primary Motor",
+              "topic": "/Telemetry/SuperSystem/Intake Slapdown/Connected/Primary Motor",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -372,7 +354,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Intake Roller/Connected/Primary Motor",
+              "topic": "/Telemetry/SuperSystem/Intake Roller/Connected/Primary Motor",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -389,7 +371,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Indexer/Connected/Primary Motor",
+              "topic": "/Telemetry/SuperSystem/Indexer/Connected/Primary Motor",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -406,58 +388,7 @@
             "height": 64.0,
             "type": "Boolean Box",
             "properties": {
-              "topic": "/Robot/SuperSystem/Indexer/Connected/Secondary Motor 0",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Conveyor",
-            "x": 1408.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/SuperSystem/Conveyor/Connected/Primary Motor",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Shooting Zone",
-            "x": 1152.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/Robot/Shooting Zone",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "Passing Zone",
-            "x": 1280.0,
-            "y": 512.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/Robot/Robot/Passing Zone",
+              "topic": "/Telemetry/SuperSystem/Indexer/Connected/Secondary Motor 0",
               "period": 0.06,
               "data_type": "boolean",
               "true_color": 4283215696,
@@ -531,6 +462,75 @@
               "wrap_value": false,
               "show_pointer": true,
               "show_ticks": true
+            }
+          },
+          {
+            "title": "Battery Voltage",
+            "x": 0.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Voltage View",
+            "properties": {
+              "topic": "/Telemetry/Robot/Battery Voltage",
+              "period": 0.06,
+              "data_type": "double",
+              "min_value": 4.0,
+              "max_value": 13.0,
+              "divisions": 5,
+              "inverted": false,
+              "orientation": "horizontal"
+            }
+          },
+          {
+            "title": "Shooting Zone",
+            "x": 1152.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Telemetry/Robot/Shooting Zone",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Passing Zone",
+            "x": 1280.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Telemetry/Robot/Passing Zone",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Conveyor",
+            "x": 1408.0,
+            "y": 512.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Telemetry/SuperSystem/Conveyor/Connected/Primary Motor",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           }
         ]

@@ -149,14 +149,14 @@ public class RobotContainer {
         .onFalse(superSystem.stopIntaking());
 
       // driverController.buttonDown()
-      //   .whileTrue(superSystem.shootWithTuning())
+      //   .whileTrue(superSystem.flywheelWithTuning())
       //   .onFalse(superSystem.stopFlywheel());
       // driverController.buttonUp()
       //   .whileTrue(superSystem.shootWithDistance())
       //   .onFalse(superSystem.stopFlywheel());
-      // driverController.buttonLeft()
+      // driverController.buttonRight()
       //   .whileTrue(superSystem.shootWithCondition())
-      //   .onFalse(superSystem.stopShooting());
+      //   .onFalse(superSystem.stopShoot());
 
       // driverController.bumperLeft()
       //   .whileTrue(superSystem.climbUp())
@@ -184,7 +184,7 @@ public class RobotContainer {
       
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
-        // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
+        // .whileTrue(superSystem.flywheelWithTuning()) // USE ELASTIC
         .onFalse(superSystem.stopFlywheel());
       operatorController.triggerLeft()
         .onTrue(superSystem.setFlywheelCommand(37))
@@ -260,7 +260,7 @@ public class RobotContainer {
    */
   public static double allianceShiftTime() {
     // if (!RobotState.isFMSAttached()) { DogLog.forceNT.log("Match Info/Shift Name", "DriverStation not attached"); return 0.0; };
-    boolean wonAuto = true;
+    boolean wonAuto = true; 
     if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.MEDIUM) {
       try {
         String data = MatchState.getGameData().get();

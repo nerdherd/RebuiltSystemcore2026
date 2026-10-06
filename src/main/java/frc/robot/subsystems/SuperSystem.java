@@ -298,7 +298,7 @@ public class SuperSystem implements Reportable {
     }
 
     public boolean useHoodShoot() {
-        return !Constants.ZoneConstants.kShootingGroup.check(swerveDrivetrain.getPose()); 
+        return !Constants.ZoneConstants.kShootingGroup.check(swerveDrivetrain.getPose()) || true; 
     }
 
     public double getHubDistance() {

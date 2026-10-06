@@ -43,27 +43,6 @@
             }
           },
           {
-            "title": "Velocity",
-            "x": 512.0,
-            "y": 384.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/Robot/SuperSystem/Shooter/Velocity",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -140.0,
-              "end_angle": 140.0,
-              "min_value": 0.0,
-              "max_value": 100.0,
-              "number_of_labels": 8,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": true
-            }
-          },
-          {
             "title": "Shift Time",
             "x": 768.0,
             "y": 128.0,
@@ -531,6 +510,27 @@
               "topic": "/Tunables/Autos/Chooser",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "Velocity",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Radial Gauge",
+            "properties": {
+              "topic": "/Telemetry/SuperSystem/Shooter/Velocity",
+              "period": 0.06,
+              "data_type": "double",
+              "start_angle": -140.0,
+              "end_angle": 140.0,
+              "min_value": 0.0,
+              "max_value": 100.0,
+              "number_of_labels": 8,
+              "wrap_value": false,
+              "show_pointer": true,
+              "show_ticks": true
             }
           }
         ]

@@ -389,8 +389,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.116428)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.361916);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.118857)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.222267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()
@@ -461,8 +461,8 @@ public final class Constants {
         .withMotionMagic(kMotionMagicConfigs)
         .withMotorOutput(kMotorOutputConfigs);
 
-    public static final double kDownPos = 0.01; //Should do multiple trials
-    public static final double kUpPos = 0.8; // Should do multiple trials
+    public static final double kDownPos = 0.005; //Should do multiple trials
+    public static final double kUpPos = 0.87; // Should do multiple trials
   }
 
   public static class LEDConstants {

@@ -58,15 +58,14 @@ public class RobotContainer {
     
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
-      superSystem.initializeLEDs();
     }
     
     Subsystems.init();
-    autoManager = new Autos(superSystem);
-    autoManager.initAutoChooser();
-    autoManager.initNamedCommands();
-    initializeLogging();
 
+    Autos.initBindings(superSystem);
+    Autos.initAutoChooser();
+
+    initializeLogging();
     NerdLog.reportInfo("Initialization Complete");
   }
 
@@ -150,14 +149,14 @@ public class RobotContainer {
         .onFalse(superSystem.stopIntaking());
 
       // driverController.buttonDown()
-      //   .whileTrue(superSystem.shootWithTuning())
+      //   .whileTrue(superSystem.flywheelWithTuning())
       //   .onFalse(superSystem.stopFlywheel());
       // driverController.buttonUp()
       //   .whileTrue(superSystem.shootWithDistance())
       //   .onFalse(superSystem.stopFlywheel());
-      // driverController.buttonLeft()
+      // driverController.buttonRight()
       //   .whileTrue(superSystem.shootWithCondition())
-      //   .onFalse(superSystem.stopShooting());
+      //   .onFalse(superSystem.stopShoot());
 
       // driverController.bumperLeft()
       //   .whileTrue(superSystem.climbUp())
@@ -185,7 +184,7 @@ public class RobotContainer {
       
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
-        // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
+        // .whileTrue(superSystem.flywheelWithTuning()) // USE ELASTIC
         .onFalse(superSystem.stopFlywheel());
       operatorController.triggerLeft()
         .onTrue(superSystem.setFlywheelCommand(37))
@@ -246,7 +245,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.selectedCommand();
+    return Autos.autoChooser.getSelected();
   }
 
   public void disableAllMotors_Test() {
@@ -261,7 +260,7 @@ public class RobotContainer {
    */
   public static double allianceShiftTime() {
     // if (!RobotState.isFMSAttached()) { DogLog.forceNT.log("Match Info/Shift Name", "DriverStation not attached"); return 0.0; };
-    boolean wonAuto = true;
+    boolean wonAuto = true; 
     if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.MEDIUM) {
       try {
         String data = MatchState.getGameData().get();

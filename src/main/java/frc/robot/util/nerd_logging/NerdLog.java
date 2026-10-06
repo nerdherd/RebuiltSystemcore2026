@@ -299,7 +299,7 @@ public class NerdLog {
 	 */
 	public static void reportInfo(String message) {
 		DogLog.logFault(message, Alert.Level.LOW);
-		DriverStationErrors.reportWarning(message, false);
+		System.out.println(message);
 	}
 	
 	/**

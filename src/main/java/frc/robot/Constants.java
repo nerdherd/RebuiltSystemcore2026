@@ -30,7 +30,9 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.pathplanner.lib.config.PIDConstants;
 
+import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -139,7 +141,7 @@ public final class Constants {
     ///////////////////////////
     
     public static final double kTurnToAngleMaxVelocity = 7.00; // rad/s
-    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.5);
+    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.35);
     public static final Constraints kTurnToAngleTolerances = new Constraints(0.017, 0.05); 
 
     ////////////////////////////////////////////
@@ -147,7 +149,7 @@ public final class Constants {
     ////////////////////////////////////////////
 
     /** Used for AutoBuilder configuration */
-    public static final SwerveRequest.ApplyRobotVelocity  kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
+    public static final SwerveRequest.ApplyRobotVelocity kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
     /** Robot oriented controller */
     public static final SwerveRequest.RobotCentric      kRobotOrientedSwerveRequest = 
       new SwerveRequest.RobotCentric()
@@ -216,18 +218,28 @@ public final class Constants {
     public static final double kRobotRotationOffset = Math.PI; // rad
   }
 
+  public static final class ChoreoConstants {
+    private final static NerdPIDConstants kXControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kYControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kRControllerConstants = new NerdPIDConstants(7.5, 10.0, 0).enableContinuousInput(-Math.PI, Math.PI);
+
+    public final static PIDController kXController = kXControllerConstants.getController();
+    public final static PIDController kYController = kYControllerConstants.getController();
+    public final static PIDController kRController = kRControllerConstants.getController();
+  }
+
   public static final class PathPlannerConstants {
     public static final double kPP_P = 5.0; //6
     public static final double kPP_I = 0.0;
     public static final double kPP_D = 0.0;
 
-    public static final NerdPIDConstants kPPTranslationPIDConstants = new NerdPIDConstants(kPP_P, kPP_I, kPP_D);
+    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(kPP_P, kPP_I, kPP_D);
 
-    public static final double kPP_ThetaP = 4.0; //3
+    public static final double kPP_ThetaP = 5.0; //3
     public static final double kPP_ThetaI = 0;
-    public static final double kPP_ThetaD = 0.1;
+    public static final double kPP_ThetaD = 0.0;
 
-    public static final NerdPIDConstants kPPRotationPIDConstants = new NerdPIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
   }
 
   public static final class LoggingConstants {
@@ -377,8 +389,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.120461)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.327567);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.118857)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.222267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()
@@ -405,8 +417,8 @@ public final class Constants {
     public static final double kShootWithDistanceA = 0.84;  //<- these are chezy values, these are yesterday's values -> 0.88; // a
     public static final double kShootWithDistanceB = 31.0; // b 31.60409
 
-    public static final double kShootWithDistanceHoodA = 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
-    public static final double kShootWithDistanceHoodB = 35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
+    public static final double kShootWithDistanceHoodA = .678927;// 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
+    public static final double kShootWithDistanceHoodB = 31.914122; //35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
 
     public static final double kLookAheadRingDriveFactor = 0.3; // use to tune the ring drive
     public static final double kLookAheadFactor = 1.35; // use to tune shoot on the move left and right
@@ -449,8 +461,8 @@ public final class Constants {
         .withMotionMagic(kMotionMagicConfigs)
         .withMotorOutput(kMotorOutputConfigs);
 
-    public static final double kDownPos = 0.01; //Should do multiple trials
-    public static final double kUpPos = 0.8; // Should do multiple trials
+    public static final double kDownPos = 0.005; //Should do multiple trials
+    public static final double kUpPos = 0.87; // Should do multiple trials
   }
 
   public static class LEDConstants {

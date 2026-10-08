@@ -16,6 +16,8 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -122,7 +124,7 @@ public class Robot extends TimedRobot {
     
     if (Constants.USE_SUBSYSTEMS) {
       m_robotContainer.superSystem.enableSubsystems();
-      m_robotContainer.superSystem.reConfigureMotors();
+      if (MatchState.getMatchType() == MatchType.NONE) m_robotContainer.superSystem.reConfigureMotors();
       m_robotContainer.superSystem.resetSubsystemValues();
     }
     

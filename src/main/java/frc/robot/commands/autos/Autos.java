@@ -7,6 +7,8 @@ import org.wpilib.tunable.Tunables;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.EventMarker;
+import com.pathplanner.lib.path.EventMarker;
 
 import frc.robot.subsystems.SuperSystem;
 
@@ -18,6 +20,8 @@ public final class Autos {
 
         //top
         autoChooser.add("Top-S1Neutral2.5 w Distance", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Distance"));
+        autoChooser.add("Top-S1Neutral2.5 w Event", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Event"));
+
         autoChooser.add("trench", AutoBuilder.buildAuto("trench"));
 
         //mid
@@ -38,7 +42,7 @@ public final class Autos {
         NamedCommands.registerCommand("Intake Hold", superSystem.intakeHoldAuto());
         NamedCommands.registerCommand("Intake Start", superSystem.intake());
         NamedCommands.registerCommand("Intake Stop", superSystem.stopIntaking());
-        NamedCommands.registerCommand("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.25), superSystem.intakeHoldAuto()));
+        NamedCommands.registerCommand("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.4), superSystem.intakeHoldAuto()));
         
         // indexer and conveyor
         NamedCommands.registerCommand("Auto Shoot Start", superSystem.startShootWithCondition());
@@ -51,6 +55,8 @@ public final class Autos {
         NamedCommands.registerCommand("Flywheel Stop", superSystem.stopFlywheel());
         NamedCommands.registerCommand("Turn to Hub", superSystem.turnToHub(3.0));
         NamedCommands.registerCommand("Shoot Distance", superSystem.shootWithDistance());
+
+        
     }
    
 }

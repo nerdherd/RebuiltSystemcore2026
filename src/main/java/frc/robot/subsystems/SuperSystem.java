@@ -256,7 +256,7 @@ public class SuperSystem implements Reportable {
         return Commands.run(() -> {
             shooterState = ShooterState.PASSING;
             if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) 
-                shooter.setDesiredValue(65);
+                shooter.setDesiredValue(55);
             else 
                 shooter.setDesiredValue(45);
         });

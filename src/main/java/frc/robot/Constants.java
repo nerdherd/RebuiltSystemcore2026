@@ -557,7 +557,7 @@ public final class Constants {
   public static final class ZoneConstants {
     public static final double kHubRadius = 3.0;
     public static final double kTrenchWidth = 1.2;
-    public static final double kDistFromCenterLongPass = 0.0;
+    public static final double kDistFromCenterLongPass = 1.0;
 
     private static final NerdZone kBlueTrench = 
       new RectangleZone(

@@ -3,53 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.922680901542112,
-        "y": 4.04
+        "x": 0.6861686746987952,
+        "y": 0.6364819277108438
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.344649230795276,
-        "y": 4.500404013001613
+        "x": 0.9680352782026656,
+        "y": 0.5490636430439333
       },
       "isLocked": false,
-      "linkedName": "H0"
+      "linkedName": "O1Intake"
     },
     {
       "anchor": {
-        "x": 1.66966265060241,
-        "y": 2.6690361445783126
+        "x": 1.9559343794579167,
+        "y": 1.0655777460770333
       },
       "prevControl": {
-        "x": 1.7022168650502045,
-        "y": 3.851839269514868
+        "x": 2.0709357612254804,
+        "y": 0.7132301073300894
       },
       "nextControl": {
-        "x": 1.63687951807229,
-        "y": 1.4779156626506036
+        "x": 1.8409329976903528,
+        "y": 1.417925384823977
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.45110843373494,
-        "y": 0.6474096385542167
+        "x": 1.516019971469329,
+        "y": 2.7864194008559195
       },
       "prevControl": {
-        "x": 1.4702046474056,
-        "y": 0.3741077462489043
+        "x": 1.6038008318664287,
+        "y": 2.5523371064636593
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "O1Up"
+      "linkedName": "hi"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.1224862888482565,
-      "rotationDegrees": 90.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
       "name": "Constraints Zone",
@@ -77,13 +72,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -179.92130060003845
+    "rotation": 20.55604521958358
   },
   "reversed": false,
   "folder": "To Outpost",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

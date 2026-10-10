@@ -30,6 +30,8 @@ public final class Autos {
 
         //bottom
         autoChooser.add("Bot-S5Neutral2.5 w Distance", AutoBuilder.buildAuto("Bot-S5Neutral2.5 w Distance"));
+        autoChooser.add("Bot-S1Neutral2.5 w Event", AutoBuilder.buildAuto("Bot-S1Neutral2.5 w Event"));
+
 
         Tunables.publish("Autos/Chooser", autoChooser);
     }

@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of S1MidTriple1"
+                  "pathName": "Copy of 5MidTriple"
                 }
               }
             ]
@@ -34,7 +34,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.7
                       }
                     },
                     {
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of H45MidTriple2"
+                  "pathName": "Copy of H45-MidTHub"
                 }
               }
             ]
@@ -97,7 +97,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.7
                       }
                     },
                     {
@@ -137,7 +137,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of TopH45Intake"
+                  "pathName": "Copy of H45-Intake"
                 }
               }
             ]

@@ -99,7 +99,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Start",
+      "waypointRelativePos": 0.6699751861042064,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -113,7 +120,7 @@
     "rotation": -100.0
   },
   "reversed": false,
-  "folder": "To Neutral",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": -36.0

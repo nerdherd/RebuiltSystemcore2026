@@ -150,7 +150,20 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Start",
+      "waypointRelativePos": 0.4347394540942832,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Flywheel Start Distance",
+      "waypointRelativePos": 5.306203473945359,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -164,7 +177,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "To Neutral",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": -31.0

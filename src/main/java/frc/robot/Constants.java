@@ -30,6 +30,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.limelightvision.Limelight;
 import com.pathplanner.lib.config.PIDConstants;
 
 import org.wpilib.math.controller.PIDController;
@@ -141,7 +142,7 @@ public final class Constants {
     ///////////////////////////
     
     public static final double kTurnToAngleMaxVelocity = 7.00; // rad/s
-    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.35);
+    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.15);
     public static final Constraints kTurnToAngleTolerances = new Constraints(0.017, 0.05); 
 
     ////////////////////////////////////////////
@@ -254,18 +255,9 @@ public final class Constants {
   public static final class VisionConstants {
     /** how many frames to skip in disabled, to prevent overheating */
     public static final int kDisabledThrottle = 100;
-
-    public static enum Camera {
-      // Example("limelight-ex", "10.6.87.XX:5802"),
-      Front("limelight-fr", "10.6.87.17:5802"),
-      Back("limelight-br", "10.6.87.15:5802");
-
-      public final String name, ip;
-      Camera(String name, String ip) {
-        this.name = name;
-        this.ip = ip;
-      }
-    }
+    
+    public static Limelight kLimelightFR = new Limelight("limelight-fr");
+    public static Limelight kLimelightBR = new Limelight("limelight-br");
   }
 
   public static final class IntakeSlapdownConstants {

@@ -102,7 +102,7 @@ public class RobotContainer {
       // robot oriented adjustment (dpad)
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
-        ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 1.5)
+        ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 2.5)
         .rotateBy((!driverController.getBumperRight()) ? Rotation2d.ZERO : 
             Rotation2d.fromRadians(swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadRingDriveFactor) - swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) - kOffset)),
       // joystick drive field oriented

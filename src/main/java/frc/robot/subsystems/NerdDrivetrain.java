@@ -32,6 +32,7 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -98,7 +99,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         if (USE_VISION) {
             // visionUpdate(Camera.Example);
             visionUpdate(VisionConstants.kLimelightFR, "limelight-fr", true);
-            // visionUpdate(VisionConstants.kLimelightBR, "limelight-br", RobotState.isTeleop());
+            visionUpdate(VisionConstants.kLimelightBR, "limelight-br", RobotState.isTeleop());
             // Limelight.flushNT();
         }
     }

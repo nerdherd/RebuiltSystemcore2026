@@ -12,7 +12,6 @@ import static frc.robot.Constants.SwerveDriveConstants.kTargetDriveController;
 import static frc.robot.Constants.SwerveDriveConstants.kTargetDriveMaxLateralVelocity;
 import static frc.robot.Constants.SwerveDriveConstants.kTowSwerveRequest;
 
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -33,7 +32,6 @@ import org.wpilib.math.geometry.Transform2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.telemetry.TelemetryLoggable;
 import org.wpilib.telemetry.TelemetryTable;
@@ -100,8 +98,8 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         if (USE_VISION) {
             // visionUpdate(Camera.Example);
             visionUpdate(VisionConstants.kLimelightFR, "limelight-fr", true);
-            visionUpdate(VisionConstants.kLimelightBR, "limelight-br", RobotState.isTeleop());
-            Limelight.flushNT();
+            // visionUpdate(VisionConstants.kLimelightBR, "limelight-br", RobotState.isTeleop());
+            // Limelight.flushNT();
         }
     }
 
@@ -275,7 +273,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         else {
             // --------- MT2 --------- //
             double yaw = getSwerveHeadingDegrees();
-            limelight.setRobotOrientation(yaw, false);
+            limelight.setRobotOrientation(yaw, true);
             PoseEstimate mt = limelight.getPoseEstimate(PoseEstimateType.MT2_WPIBLUE);
             field.getObject(name).setPose(nullPose);
             if (mt == null || Math.abs(getPigeon2().getAngularVelocityZWorld().getValueAsDouble()) > 720 || mt.reportedTagCount == 0) return;
@@ -285,7 +283,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
             field.getObject(name).setPose(mt.pose);
             double stddev = (mt.avgTagDistanceMeters > 3) ? 2.0 : 0.7;
             setVisionMeasurementStdDevs(VecBuilder.fill(stddev, stddev, 9999999)); // TODO consider other stddevs
-            addVisionMeasurement(mt.pose, Utils.getCurrentTimeSeconds());
+            addVisionMeasurement(mt.pose, mt.timestampSeconds);
         }
     }
     private Pose2d nullPose = new Pose2d(-100,-100, Rotation2d.ZERO);

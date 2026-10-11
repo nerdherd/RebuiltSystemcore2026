@@ -52,12 +52,12 @@
         "y": 4.358005698005699
       },
       "prevControl": {
-        "x": 5.802236467236467,
-        "y": 4.991096866096866
+        "x": 5.966918687589158,
+        "y": 5.024807417974323
       },
       "nextControl": {
-        "x": 6.499911054991422,
-        "y": 3.8883209048067755
+        "x": 6.388092486917616,
+        "y": 3.834027040348115
       },
       "isLocked": false,
       "linkedName": null
@@ -96,16 +96,16 @@
     },
     {
       "anchor": {
-        "x": 2.9081054131054134,
-        "y": 5.456225071225072
+        "x": 2.9004564907275316,
+        "y": 5.438844507845934
       },
       "prevControl": {
-        "x": 3.1539308936732597,
-        "y": 5.410729652734993
+        "x": 3.1462819712953785,
+        "y": 5.393349089355855
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "H45"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -150,20 +150,7 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Intake Start",
-      "waypointRelativePos": 0.7366906474819999,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Flywheel Start Distance",
-      "waypointRelativePos": 5.2834532374100425,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

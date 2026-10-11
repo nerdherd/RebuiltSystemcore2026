@@ -17,7 +17,8 @@ public final class Autos {
 
         //top
         autoChooser.add("Top-S1Neutral2.5 w Distance", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Distance"));
-        // autoChooser.add("Top-S1Neutral2.5 w Event", AutoBuilder.buildAuto("Top-S1Neutral2.5 w Event"));
+
+        // autoChooser.add("Top-S1Neutral2.5 w DistanceNew", AutoBuilder.buildAuto("Top-S1Neutral2.5 w DistanceNew"));
 
         autoChooser.add("trench", AutoBuilder.buildAuto("trench"));
 

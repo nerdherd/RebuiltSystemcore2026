@@ -16,32 +16,32 @@
     },
     {
       "anchor": {
-        "x": 7.739514978601996,
-        "y": 7.10793152639087
+        "x": 7.325477888730385,
+        "y": 6.719771754636234
       },
       "prevControl": {
-        "x": 7.072865061924705,
-        "y": 7.566253344106508
+        "x": 6.833808844507845,
+        "y": 7.573723252496434
       },
       "nextControl": {
-        "x": 7.946533523537802,
-        "y": 6.965606276747503
+        "x": 7.450829391266397,
+        "y": 6.502055987073686
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.7144301994302005,
-        "y": 4.900655270655271
+        "x": 7.713637660485022,
+        "y": 4.623708987161199
       },
       "prevControl": {
-        "x": 7.964403917609016,
-        "y": 4.897030326537362
+        "x": 7.944186255942155,
+        "y": 4.720390656223867
       },
       "nextControl": {
-        "x": 7.183152639087017,
-        "y": 4.9083594864479325
+        "x": 6.911440798858774,
+        "y": 4.287303851640513
       },
       "isLocked": false,
       "linkedName": null
@@ -64,32 +64,32 @@
     },
     {
       "anchor": {
-        "x": 4.22596866096866,
-        "y": 5.443304843304843
+        "x": 4.4013409415121245,
+        "y": 5.425905848787448
       },
       "prevControl": {
-        "x": 4.5479670584045575,
-        "y": 5.4421036324786325
+        "x": 4.723339338948022,
+        "y": 5.424704637961237
       },
       "nextControl": {
-        "x": 3.903970263532763,
-        "y": 5.444506054131054
+        "x": 4.079342544076227,
+        "y": 5.427107059613658
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.9081054131054134,
-        "y": 5.456225071225072
+        "x": 3.055720399429386,
+        "y": 5.412967189728959
       },
       "prevControl": {
-        "x": 4.496920227920228,
-        "y": 5.469364672364674
+        "x": 4.6445352142442,
+        "y": 5.426106790868561
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "H45"
+      "linkedName": null
     }
   ],
   "rotationTargets": [
@@ -99,11 +99,11 @@
     },
     {
       "waypointRelativePos": 0.7870154133582448,
-      "rotationDegrees": -100.001
+      "rotationDegrees": -50.0
     },
     {
       "waypointRelativePos": 1.7505838393274078,
-      "rotationDegrees": -100.0
+      "rotationDegrees": -90.0
     },
     {
       "waypointRelativePos": 2.6366184026155888,
@@ -177,26 +177,7 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "Intake Down Sequence",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Flywheel Start Distance",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "Intake Start",
-      "waypointRelativePos": 0.5659472422062313,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

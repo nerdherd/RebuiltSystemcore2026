@@ -243,12 +243,27 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
      * activates or deactivates vision by setting the pipeline either to 0 for active or 1 for inactive
      * and by adjusting throttle, see {@link LimelightHelpers#SetThrottle(String, int)}
      * @param activate whether to activate or deactivate
+     * @param limelights which limelights to activate/deactivate
+     */
+    public void setVision(boolean activate, Limelight... limelights) {
+        int newPipeline = (activate) ? 0 : 1;
+        int newThrottle = (activate) ? 0 : 1; // TODO set this value
+        for (Limelight limelight : limelights) {
+            limelight.setPipelineIndex(newPipeline);
+            limelight.setThrottle(newThrottle);
+        }
+    }
+
+    /**
+     * activates or deactivates vision by setting the pipeline either to 0 for active or 1 for inactive
+     * and by adjusting throttle, see {@link LimelightHelpers#SetThrottle(String, int)}
+     * @param activate whether to activate or deactivate
      */
     public void setVision(boolean activate) {
-        VisionConstants.kLimelightFR.setPipelineIndex(0);
-        VisionConstants.kLimelightFR.setThrottle(0);
-        VisionConstants.kLimelightBR.setPipelineIndex(0);
-        VisionConstants.kLimelightBR.setThrottle(0);
+        setVision(activate,
+            VisionConstants.kLimelightFR,
+            VisionConstants.kLimelightBR
+        );
     }
     
     /**
@@ -264,18 +279,26 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
     }
 
     private boolean doVisionReset = false;
+    /**
+     * Update pose estimate using limelights
+     * @param limelights which limelights to use
+     */
     public void visionUpdateAll(Limelight... limelights) {
         if (doVisionReset) {
             double totalAngle = 0.0;
             int estimateCount = 0;
             for (Limelight limelight : limelights){
+                if (limelight.getCurrentPipelineIndex() != 0) continue;
+
                 for (var estimate : limelight.readAcceptedPoseEstimates(PoseEstimateType.MT1_WPIBLUE)){
                     estimateCount++;
                     totalAngle += estimate.pose.getRotation().getRadians();
                 }
             }
+            if (estimateCount == 0) return;
             resetRotation(new Rotation2d(totalAngle/ (double) estimateCount));
             doVisionReset = false;
+            setDriverHeadingForward();
             return;
         }
         
@@ -287,9 +310,29 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
             Limelight.setSharedRobotOrientation(yaw);
         }
         for (Limelight limelight : limelights) {
+            if (limelight.getCurrentPipelineIndex() != 0) continue;
+
+            field.getObject(limelight.getName()).setPose(nullPose);
+            double total_x = 0;
+            double total_y = 0;
+            double total_r = 0;
+            int count = 0;
             for (var estimate : limelight.readAcceptedPoseEstimates(estimateType)) {
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds, estimate.stdDevs);
+                total_x += estimate.pose.getX();
+                total_y += estimate.pose.getY();
+                total_r += estimate.pose.getRotation().getRadians();
+                count++;
             }
+            if (count == 0) continue;
+            double inv_count = 1.0/(double)count;
+            field.getObject(limelight.getName()).setPose(
+                new Pose2d(
+                    total_x*inv_count,
+                    total_y*inv_count,
+                    new Rotation2d(total_r*inv_count)
+                )
+            );
         }
     }
 
@@ -427,6 +470,7 @@ public class NerdDrivetrain extends TunerSwerveDrivetrain implements Subsystem, 
         NerdLog.logNumber(kSwerveTab + "/Swerve Heading", this::getSwerveHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
         NerdLog.logNumber(kSwerveTab + "/Driver Heading", this::getDriverHeadingDegrees, "deg", LOG_LEVEL.MEDIUM);
         NerdLog.logBoolean(kSwerveTab + "/Using MT2", () -> this.useMegaTag2, LOG_LEVEL.MEDIUM);
+        NerdLog.logBoolean(kSwerveTab + "/Resetting Heading with Vision", () -> this.doVisionReset, LOG_LEVEL.ALL); // TODO check if this is good 
         
         //////////////
         /// MINIMAL //

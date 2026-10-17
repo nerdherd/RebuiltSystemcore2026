@@ -214,14 +214,6 @@ public final class Constants {
     }
   }
 
-  public static final class RingDriveConstants {
-    public static final double kInitialDistance = 0.2; // m
-    public static final double kDriveVelocity = 1.0; // m/s
-    public static final double kMaximumDistance = 1.0; // m
-    public static final double kMinimumDistance = 0.2; // m
-    public static final double kRobotRotationOffset = Math.PI; // rad
-  }
-
   public static final class ChoreoConstants {
     private final static NerdPIDConstants kXControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
     private final static NerdPIDConstants kYControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
@@ -233,17 +225,8 @@ public final class Constants {
   }
 
   public static final class PathPlannerConstants {
-    public static final double kPP_P = 5.0; //6
-    public static final double kPP_I = 0.0;
-    public static final double kPP_D = 0.0;
-
-    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(kPP_P, kPP_I, kPP_D);
-
-    public static final double kPP_ThetaP = 5.0; //3
-    public static final double kPP_ThetaI = 0;
-    public static final double kPP_ThetaD = 0.0;
-
-    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(5.0, 0.0, 0.0);
   }
 
   public static final class LoggingConstants {
@@ -259,8 +242,6 @@ public final class Constants {
     /** how many frames to skip in disabled, to prevent overheating */
     public static final int kDisabledThrottle = 100;
 
-    public static double untrusted = PoseEstimateConfig.UNTRUSTED;
-    //TODO: check these configs
     public static PoseEstimateConfig mt1Config = PoseEstimateConfig.defaultMT1() // starting with the safe default means you are not required to set every single configuration value
             .withMinTagCount(1)
             .withMaxSingleTagAmbiguity(0.7) // MT1 needs low-ambiguity perspectives
@@ -270,7 +251,7 @@ public final class Constants {
             .withFieldBounds(16.541, 8.069) // Reject pose estimates that are out of bounds.
             .withFieldBoundsMargin(0.5) // Add .5m margin around field.
             .withStdDevXY(0.5, 0.05, 2.0) // .5 base, absolute min .05, absolute max 2.0. With scaling enabled, .5 at 1m distance
-            .withStdDevTheta(untrusted, untrusted, untrusted) // never incorporate pose estimate rotation. You may want to incorporate rotation by setting these to other values
+            .withStdDevTheta(PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED) // never incorporate pose estimate rotation. You may want to incorporate rotation by setting these to other values
             .withStdDevDistanceScaling(1.0, 0.0, 6.0) // linear scaling, only scale between 0 and 6m.
             .withStdDevTagCountDivision(0.5); // Enhance trust by square root of number of contributing tags
 
@@ -283,16 +264,16 @@ public final class Constants {
             .withFieldBounds(16.541, 8.069)
             .withFieldBoundsMargin(0.5)
             .withStdDevXY(0.3, 0.0001, 2.0)
-            .withStdDevTheta(untrusted, untrusted, untrusted)
+            .withStdDevTheta(PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED)
             .withStdDevDistanceScaling(0.5, 0.0, 8.0) // Less aggressive STDDev scaling for MT2. Scale by sqrt(distance) rather than distance^1.
             .withStdDevTagCountDivision(0.5); // Enhance trust by a factor equal to the square root of number of contributing tags
     
-    @SuppressWarnings("resource") //Limelight objects implement AutoClosable and the compiler hates method chaining but its fine
+    @SuppressWarnings("resource")
     public static Limelight kLimelightFR = new Limelight(
       "limelight-fr",
       new Pose3d(-0.279,0,0.521,  Rotation3d.fromDegrees(0,-20,0)) //TODO: make sure these are right
     ).withPoseEstimateConfig_MT1(mt1Config)
-    .withPoseEstimateConfig_MT2(mt2Config);
+     .withPoseEstimateConfig_MT2(mt2Config);
     @SuppressWarnings("resource")
     public static Limelight kLimelightBR = new Limelight(
       "limelight-br",

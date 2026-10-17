@@ -79,7 +79,7 @@ public class Robot extends TimedRobot {
       m_robotContainer.superSystem.reConfigureMotors();
     }
 
-    m_robotContainer.swerveDrive.setVision(false);
+    m_robotContainer.swerveDrive.initializeVision();
     m_robotContainer.swerveDrive.stop();
   }
 
@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
     
-    m_robotContainer.swerveDrive.setVision(USE_VISION);
+    m_robotContainer.swerveDrive.initializeVision();
     if (USE_VISION) {
       CommandScheduler.getInstance().schedule(Commands.runOnce(m_robotContainer.swerveDrive::recalibrateGyroMT1));
     }
@@ -128,7 +128,7 @@ public class Robot extends TimedRobot {
       m_robotContainer.superSystem.resetSubsystemValues();
     }
     
-    m_robotContainer.swerveDrive.setVision(USE_VISION);
+    m_robotContainer.swerveDrive.initializeVision();
     if (USE_VISION) {
       CommandScheduler.getInstance().schedule(m_robotContainer.swerveDrive.resetPoseWithAprilTags(0.1));
       CommandScheduler.getInstance().schedule(Commands.runOnce(m_robotContainer.swerveDrive::setDriverHeadingForward));

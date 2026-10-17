@@ -290,13 +290,13 @@ public final class Constants {
     @SuppressWarnings("resource") //Limelight objects implement AutoClosable and the compiler hates method chaining but its fine
     public static Limelight kLimelightFR = new Limelight(
       "limelight-fr",
-      new Pose3d(-0.279,0,0.521, new Rotation3d(0,20,0)) //TODO: make sure these are right
+      new Pose3d(-0.279,0,0.521,  Rotation3d.fromDegrees(0,-20,0)) //TODO: make sure these are right
     ).withPoseEstimateConfig_MT1(mt1Config)
     .withPoseEstimateConfig_MT2(mt2Config);
     @SuppressWarnings("resource")
     public static Limelight kLimelightBR = new Limelight(
       "limelight-br",
-      new Pose3d(-0.279,0.235,0.254, new Rotation3d(0,30,180))
+      new Pose3d(-0.279,0.235,0.254, Rotation3d.fromDegrees(0,-30,180))
     ).withPoseEstimateConfig_MT1(mt1Config)
     .withPoseEstimateConfig_MT2(mt2Config);
   }

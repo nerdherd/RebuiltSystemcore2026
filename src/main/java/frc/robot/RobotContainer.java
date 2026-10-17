@@ -11,13 +11,13 @@ import java.util.NoSuchElementException;
 import dev.doglog.DogLog;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.networktables.StringSubscriber;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.RobotState;
 import org.wpilib.driverstation.Alliance;
 import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.system.RobotController;
+import org.wpilib.tunable.Tunable;
 import org.wpilib.hardware.power.PowerDistribution.ModuleType;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
@@ -58,15 +58,14 @@ public class RobotContainer {
     
     if (Constants.USE_SUBSYSTEMS) { // add subsystems
       superSystem = new SuperSystem(swerveDrive);
-      superSystem.initializeLEDs();
     }
     
     Subsystems.init();
-    autoManager = new Autos(superSystem);
-    autoManager.initAutoChooser();
-    autoManager.initNamedCommands();
-    initializeLogging();
 
+    Autos.initBindings(superSystem);
+    Autos.initAutoChooser();
+
+    initializeLogging();
     NerdLog.reportInfo("Initialization Complete");
   }
 
@@ -103,7 +102,7 @@ public class RobotContainer {
       // robot oriented adjustment (dpad)
       () -> new Translation2d(
         (((driverController.getDpadUp() && !driverController.getBumperRight()) ? 1 : 0) - (driverController.getDpadDown() ? 1 : 0)) * kRobotOrientedVelocity, 
-        ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 1.5)
+        ((driverController.getDpadLeft() ? 1 : 0) - (driverController.getDpadRight() ? 1 : 0)) * 2.5)
         .rotateBy((!driverController.getBumperRight()) ? Rotation2d.ZERO : 
             Rotation2d.fromRadians(swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadRingDriveFactor) - swerveDrive.angleToLookAheadPose(FieldPositions.HUB_CENTER, ShooterConstants.kLookAheadFactor) - kOffset)),
       // joystick drive field oriented
@@ -150,14 +149,14 @@ public class RobotContainer {
         .onFalse(superSystem.stopIntaking());
 
       // driverController.buttonDown()
-      //   .whileTrue(superSystem.shootWithTuning())
+      //   .whileTrue(superSystem.flywheelWithTuning())
       //   .onFalse(superSystem.stopFlywheel());
       // driverController.buttonUp()
       //   .whileTrue(superSystem.shootWithDistance())
       //   .onFalse(superSystem.stopFlywheel());
-      // driverController.buttonLeft()
+      // driverController.buttonRight()
       //   .whileTrue(superSystem.shootWithCondition())
-      //   .onFalse(superSystem.stopShooting());
+      //   .onFalse(superSystem.stopShoot());
 
       // driverController.bumperLeft()
       //   .whileTrue(superSystem.climbUp())
@@ -185,7 +184,7 @@ public class RobotContainer {
       
       operatorController.triggerRight()
         .whileTrue(superSystem.shootWithDistance())
-        // .whileTrue(superSystem.shootWithTuning()) // USE ELASTIC
+        // .whileTrue(superSystem.flywheelWithTuning()) // USE ELASTIC
         .onFalse(superSystem.stopFlywheel());
       operatorController.triggerLeft()
         .onTrue(superSystem.setFlywheelCommand(37))
@@ -221,7 +220,7 @@ public class RobotContainer {
     Controller.configureDebugBindings(testController);
   }
 
-  public StringSubscriber printLog = null;
+  public Tunable<String> printLog = null;
   public void initializeLogging() {
     if (printLog == null) printLog = DogLog.tunable("Print", "", (value) -> NerdLog.reportInfo("" + value));
     NerdLog.logData("Robot/PDP", pdp, LOG_LEVEL.ALL);
@@ -246,7 +245,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Autos.autoChooser.selectedCommand();
+    return Autos.autoChooser.getSelected();
   }
 
   public void disableAllMotors_Test() {
@@ -261,7 +260,7 @@ public class RobotContainer {
    */
   public static double allianceShiftTime() {
     // if (!RobotState.isFMSAttached()) { DogLog.forceNT.log("Match Info/Shift Name", "DriverStation not attached"); return 0.0; };
-    boolean wonAuto = true;
+    boolean wonAuto = true; 
     if (Constants.ROBOT_LOG_LEVEL == LOG_LEVEL.MEDIUM) {
       try {
         String data = MatchState.getGameData().get();

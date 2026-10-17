@@ -30,9 +30,15 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.limelightvision.Limelight;
+import com.limelightvision.PoseEstimateConfig;
+import com.pathplanner.lib.config.PIDConstants;
 
+import org.wpilib.math.controller.PIDController;
 import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.trajectory.TrapezoidProfile.Constraints;
 import org.wpilib.math.util.Units;
@@ -139,7 +145,7 @@ public final class Constants {
     ///////////////////////////
     
     public static final double kTurnToAngleMaxVelocity = 7.00; // rad/s
-    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.5);
+    public static final NerdPIDConstants kTurnToAnglePIDConstants = new NerdPIDConstants(12.0, 0.0, 0.15);
     public static final Constraints kTurnToAngleTolerances = new Constraints(0.017, 0.05); 
 
     ////////////////////////////////////////////
@@ -147,7 +153,7 @@ public final class Constants {
     ////////////////////////////////////////////
 
     /** Used for AutoBuilder configuration */
-    public static final SwerveRequest.ApplyRobotVelocity  kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
+    public static final SwerveRequest.ApplyRobotVelocity kApplyRobotSpeedsRequest = new SwerveRequest.ApplyRobotVelocity();
     /** Robot oriented controller */
     public static final SwerveRequest.RobotCentric      kRobotOrientedSwerveRequest = 
       new SwerveRequest.RobotCentric()
@@ -208,26 +214,19 @@ public final class Constants {
     }
   }
 
-  public static final class RingDriveConstants {
-    public static final double kInitialDistance = 0.2; // m
-    public static final double kDriveVelocity = 1.0; // m/s
-    public static final double kMaximumDistance = 1.0; // m
-    public static final double kMinimumDistance = 0.2; // m
-    public static final double kRobotRotationOffset = Math.PI; // rad
+  public static final class ChoreoConstants {
+    private final static NerdPIDConstants kXControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kYControllerConstants = new NerdPIDConstants(10.0, 0.0, 0);
+    private final static NerdPIDConstants kRControllerConstants = new NerdPIDConstants(7.5, 10.0, 0).enableContinuousInput(-Math.PI, Math.PI);
+
+    public final static PIDController kXController = kXControllerConstants.getController();
+    public final static PIDController kYController = kYControllerConstants.getController();
+    public final static PIDController kRController = kRControllerConstants.getController();
   }
 
   public static final class PathPlannerConstants {
-    public static final double kPP_P = 5.0; //6
-    public static final double kPP_I = 0.0;
-    public static final double kPP_D = 0.0;
-
-    public static final NerdPIDConstants kPPTranslationPIDConstants = new NerdPIDConstants(kPP_P, kPP_I, kPP_D);
-
-    public static final double kPP_ThetaP = 4.0; //3
-    public static final double kPP_ThetaI = 0;
-    public static final double kPP_ThetaD = 0.1;
-
-    public static final NerdPIDConstants kPPRotationPIDConstants = new NerdPIDConstants(kPP_ThetaP, kPP_ThetaI, kPP_ThetaD);
+    public static final PIDConstants kPPTranslationPIDConstants = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants kPPRotationPIDConstants = new PIDConstants(5.0, 0.0, 0.0);
   }
 
   public static final class LoggingConstants {
@@ -243,17 +242,44 @@ public final class Constants {
     /** how many frames to skip in disabled, to prevent overheating */
     public static final int kDisabledThrottle = 100;
 
-    public static enum Camera {
-      // Example("limelight-ex", "10.6.87.XX:5802"),
-      Front("limelight-fr", "10.6.87.17:5802"),
-      Back("limelight-br", "10.6.87.15:5802");
+    public static PoseEstimateConfig mt1Config = PoseEstimateConfig.defaultMT1() // starting with the safe default means you are not required to set every single configuration value
+            .withMinTagCount(1)
+            .withMaxSingleTagAmbiguity(0.7) // MT1 needs low-ambiguity perspectives
+            .withMaxSingleTagDistance(4.0) // If we only see one tag, don't trust it unless we are at most 4m away from it
+            .withMaxAvgTagDistance(6.0) // If we see multiple tags, max avg distance must be less than 6 meters.
+            .withMinAvgTagArea(0.02) // 0-100, percentage of image area. This is .02%, not 2%.
+            .withFieldBounds(16.541, 8.069) // Reject pose estimates that are out of bounds.
+            .withFieldBoundsMargin(0.5) // Add .5m margin around field.
+            .withStdDevXY(0.5, 0.05, 2.0) // .5 base, absolute min .05, absolute max 2.0. With scaling enabled, .5 at 1m distance
+            .withStdDevTheta(PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED) // never incorporate pose estimate rotation. You may want to incorporate rotation by setting these to other values
+            .withStdDevDistanceScaling(1.0, 0.0, 6.0) // linear scaling, only scale between 0 and 6m.
+            .withStdDevTagCountDivision(0.5); // Enhance trust by square root of number of contributing tags
 
-      public final String name, ip;
-      Camera(String name, String ip) {
-        this.name = name;
-        this.ip = ip;
-      }
-    }
+    public static PoseEstimateConfig mt2Config = PoseEstimateConfig.defaultMT2()
+            .withMinTagCount(1)
+            .withMaxSingleTagAmbiguity(1.0) // MT2 can handle maximally ambiguous perspectives. Accept tags regardless of ambiguity value.
+            .withMaxSingleTagDistance(0.0) // 0 disables this check
+            .withMaxAvgTagDistance(8.0)
+            .withMinAvgTagArea(0.02) //0-100, percentage of image area
+            .withFieldBounds(16.541, 8.069)
+            .withFieldBoundsMargin(0.5)
+            .withStdDevXY(0.3, 0.0001, 2.0)
+            .withStdDevTheta(PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED, PoseEstimateConfig.UNTRUSTED)
+            .withStdDevDistanceScaling(0.5, 0.0, 8.0) // Less aggressive STDDev scaling for MT2. Scale by sqrt(distance) rather than distance^1.
+            .withStdDevTagCountDivision(0.5); // Enhance trust by a factor equal to the square root of number of contributing tags
+    
+    @SuppressWarnings("resource")
+    public static Limelight kLimelightFR = new Limelight(
+      "limelight-fr",
+      new Pose3d(-0.279,0,0.521,  Rotation3d.fromDegrees(0,-20,0)) //TODO: make sure these are right
+    ).withPoseEstimateConfig_MT1(mt1Config)
+     .withPoseEstimateConfig_MT2(mt2Config);
+    @SuppressWarnings("resource")
+    public static Limelight kLimelightBR = new Limelight(
+      "limelight-br",
+      new Pose3d(-0.279,0.235,0.254, Rotation3d.fromDegrees(0,-30,180))
+    ).withPoseEstimateConfig_MT1(mt1Config)
+    .withPoseEstimateConfig_MT2(mt2Config);
   }
 
   public static final class IntakeSlapdownConstants {
@@ -377,8 +403,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.119098)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.250267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.118857)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.222267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()
@@ -405,8 +431,8 @@ public final class Constants {
     public static final double kShootWithDistanceA = 0.84;  //<- these are chezy values, these are yesterday's values -> 0.88; // a
     public static final double kShootWithDistanceB = 31.0; // b 31.60409
 
-    public static final double kShootWithDistanceHoodA = 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
-    public static final double kShootWithDistanceHoodB = 35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
+    public static final double kShootWithDistanceHoodA = .678927;// 0.536846;  //<- these are chezy values, these are yesterday's values -> 0.50846; // a
+    public static final double kShootWithDistanceHoodB = 31.914122; //35.29764;  //<- these are chezy values, these are yesterday's values -> 34.29764; // b
 
     public static final double kLookAheadRingDriveFactor = 0.3; // use to tune the ring drive
     public static final double kLookAheadFactor = 1.35; // use to tune shoot on the move left and right
@@ -419,7 +445,7 @@ public final class Constants {
     private static final Slot0Configs kSlot0Configs = 
       new Slot0Configs()
         .withKP(3)
-        .withKI(3)
+        .withKI(0)
         .withKD(0.15)
         .withKV(0.3)
         .withKS(0)
@@ -449,8 +475,8 @@ public final class Constants {
         .withMotionMagic(kMotionMagicConfigs)
         .withMotorOutput(kMotorOutputConfigs);
 
-    public static final double kDownPos = 0.01; //Should do multiple trials
-    public static final double kUpPos = 0.8; // Should do multiple trials
+    public static final double kDownPos = 0.005; //Should do multiple trials
+    public static final double kUpPos = 0.87; // Should do multiple trials
   }
 
   public static class LEDConstants {
@@ -553,7 +579,7 @@ public final class Constants {
   public static final class ZoneConstants {
     public static final double kHubRadius = 3.0;
     public static final double kTrenchWidth = 1.2;
-    public static final double kDistFromCenterLongPass = 0.0;
+    public static final double kDistFromCenterLongPass = 1.0;
 
     private static final NerdZone kBlueTrench = 
       new RectangleZone(

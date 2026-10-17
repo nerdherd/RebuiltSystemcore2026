@@ -16,6 +16,8 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Commands;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.MatchType;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -77,7 +79,7 @@ public class Robot extends TimedRobot {
       m_robotContainer.superSystem.reConfigureMotors();
     }
 
-    m_robotContainer.swerveDrive.setVision(false);
+    m_robotContainer.swerveDrive.initializeVision();
     m_robotContainer.swerveDrive.stop();
   }
 
@@ -95,7 +97,7 @@ public class Robot extends TimedRobot {
       CommandScheduler.getInstance().schedule(m_autonomousCommand);
     }
     
-    m_robotContainer.swerveDrive.setVision(USE_VISION);
+    m_robotContainer.swerveDrive.initializeVision();
     if (USE_VISION) {
       CommandScheduler.getInstance().schedule(Commands.runOnce(m_robotContainer.swerveDrive::recalibrateGyroMT1));
     }
@@ -122,11 +124,11 @@ public class Robot extends TimedRobot {
     
     if (Constants.USE_SUBSYSTEMS) {
       m_robotContainer.superSystem.enableSubsystems();
-      m_robotContainer.superSystem.reConfigureMotors();
+      if (MatchState.getMatchType() == MatchType.NONE) m_robotContainer.superSystem.reConfigureMotors();
       m_robotContainer.superSystem.resetSubsystemValues();
     }
     
-    m_robotContainer.swerveDrive.setVision(USE_VISION);
+    m_robotContainer.swerveDrive.initializeVision();
     if (USE_VISION) {
       CommandScheduler.getInstance().schedule(m_robotContainer.swerveDrive.resetPoseWithAprilTags(0.1));
       CommandScheduler.getInstance().schedule(Commands.runOnce(m_robotContainer.swerveDrive::setDriverHeadingForward));

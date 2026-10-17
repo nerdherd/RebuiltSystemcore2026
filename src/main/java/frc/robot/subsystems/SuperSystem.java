@@ -14,7 +14,7 @@ import org.wpilib.driverstation.MatchType;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathSharedStore;
-import org.wpilib.networktables.DoubleSubscriber;
+import org.wpilib.tunable.TunableDouble;
 
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -46,12 +46,11 @@ public class SuperSystem implements Reportable {
     
     public Command autoTurnToHub = null;
     public Command turnToHub(double timeout) {
-        if (autoTurnToHub == null) 
-            autoTurnToHub = new SwerveJoystickCommand(swerveDrivetrain, () -> 0.0, () -> 0.0, () -> 0.0, () -> true, 
+        return autoTurnToHub = new SwerveJoystickCommand(swerveDrivetrain, () -> 0.0, () -> 0.0, () -> 0.0, () -> true, 
                 () -> swerveDrivetrain.angleToPose(FieldPositions.HUB_CENTER) + RobotContainer.kOffset, 
-                () -> Translation2d.ZERO, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0));
+                () -> Translation2d.ZERO, () -> false, () -> false, () -> 0.0).finallyDo(() -> swerveDrivetrain.driveRobotOriented(0.0, 0.0, 0.0))
+                    .raceWith(Commands.waitSeconds(timeout));
 
-        return autoTurnToHub.raceWith(Commands.waitSeconds(timeout));
     }
 
     // ---------------------------------++ SUBSYSTEMS ++--------------------------------- //
@@ -127,8 +126,13 @@ public class SuperSystem implements Reportable {
                 else setHood(0.0);
                 break;
             case PASSING:
-                if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) setHood(1.0);
-                else setHood(0.0);
+                if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) {
+                    setHood(1.0);
+                    hood.positionController.FeedForward = 2.0;
+                } else {
+                    setHood(1.0);
+                    hood.positionController.FeedForward = 0.0;
+                }
                 break;
             case NONE:
             default: setHood(0.0); break;
@@ -139,7 +143,8 @@ public class SuperSystem implements Reportable {
         return Commands.parallel(
             indexer.setDesiredValueCommand(0),
             conveyor.setDesiredValueCommand(0),
-            hoodDownCommand()
+            hoodDownCommand(),
+            Commands.runOnce(() -> hood.positionController.FeedForward = 0.0)
         );
     }
 
@@ -220,12 +225,12 @@ public class SuperSystem implements Reportable {
                     rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
                 }
                 // spin up flywheel
-                shooter.setDesiredValue(Math.min(55.0, rps));
+                shooter.setDesiredValue(Math.min(55.0, Math.max(0.0, rps)));
             }, shooter);
     }
 
     public double shootSpeed = 0;
-    public DoubleSubscriber shootSpeedSub = null;
+    public TunableDouble shootSpeedSub = null;
     /**
      * change shootSpeed using elastic, always defaults to 0 when 
      * the code is reloaded so save the value
@@ -251,7 +256,7 @@ public class SuperSystem implements Reportable {
         return Commands.run(() -> {
             shooterState = ShooterState.PASSING;
             if (ZoneConstants.kLongPass.get().check(swerveDrivetrain.getPose())) 
-                shooter.setDesiredValue(65);
+                shooter.setDesiredValue(55);
             else 
                 shooter.setDesiredValue(45);
         });

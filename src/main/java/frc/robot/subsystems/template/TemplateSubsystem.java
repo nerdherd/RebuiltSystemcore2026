@@ -49,7 +49,7 @@ public class TemplateSubsystem extends SubsystemBase implements Reportable {
 	protected TalonFXConfiguration configuration;
 
 	/** position controller for {@link SubsystemMode#POSITION} */
-	private MotionMagicVoltage positionController = null;
+	public MotionMagicVoltage positionController = null;
 	/** velocity controller for {@link SubsystemMode#VELOCITY} */
 	private VelocityVoltage velocityController = null;
 	/** voltage controller for {@link SubsystemMode#VOLTAGE} */
@@ -392,6 +392,8 @@ public class TemplateSubsystem extends SubsystemBase implements Reportable {
 		
         NerdLog.logBoolean(kSubsystemTab + name + "/Enabled", () -> this.enabled, Reportable.LOG_LEVEL.MEDIUM);
         NerdLog.logNumber(kSubsystemTab + name + "/Desired " + getFlavorText(), () -> getDesiredValue(), getUnit(), LOG_LEVEL.MEDIUM);
+        NerdLog.logSignal(kSubsystemTab + name + "/Velocity", primaryMotor.getVelocity(false), "rps", LOG_LEVEL.MEDIUM);
+		
 
         //////////////
 		/// MINIMAL //

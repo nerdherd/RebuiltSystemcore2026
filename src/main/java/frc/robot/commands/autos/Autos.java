@@ -7,6 +7,8 @@ import org.wpilib.tunable.Tunables;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+
 import frc.robot.subsystems.SuperSystem;
 
 
@@ -43,10 +45,16 @@ public final class Autos {
         NamedCommands.registerCommand("Intake Start", superSystem.intake());
         NamedCommands.registerCommand("Intake Stop", superSystem.stopIntaking());
         NamedCommands.registerCommand("Intake Down Sequence", Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.4), superSystem.intakeHoldAuto()));
-        
+        new EventTrigger("Intake Down Sequence").onTrue(Commands.sequence(superSystem.intakeDownOnlyAuto(), Commands.waitSeconds(0.4), superSystem.intakeHoldAuto()));
+        new EventTrigger("Intake Start").onTrue(superSystem.intake());
+        new EventTrigger("Intake Stop").onTrue(superSystem.stopIntaking());
+        new EventTrigger("Intake Down Only").onTrue(superSystem.intakeDownOnlyAuto());
+        new EventTrigger("Intake Dwwn").onTrue(superSystem.intakeDownAuto());
+
         // indexer and conveyor
         NamedCommands.registerCommand("Auto Shoot Start", superSystem.startShootWithCondition());
         NamedCommands.registerCommand("Auto Shoot Stop", superSystem.stopShootWithCondition());
+
 
         // flywheel
         NamedCommands.registerCommand("Flywheel Start", superSystem.shootWithDistance());
@@ -55,8 +63,10 @@ public final class Autos {
         NamedCommands.registerCommand("Flywheel Stop", superSystem.stopFlywheel());
         NamedCommands.registerCommand("Turn to Hub", superSystem.turnToHub(3.0));
         NamedCommands.registerCommand("Shoot Distance", superSystem.shootWithDistance());
-
-        
+        new EventTrigger("Flywheel Start Distance").onTrue(superSystem.shootWithDistance());
+        new EventTrigger("Flywheel Stop Distance").onTrue(superSystem.shootWithDistance());
+        new EventTrigger("Turn to Hub").onTrue(superSystem.turnToHub(3.0));
+        new EventTrigger("Shoot Distance").onTrue(superSystem.shootWithDistance()); 
     }
    
 }

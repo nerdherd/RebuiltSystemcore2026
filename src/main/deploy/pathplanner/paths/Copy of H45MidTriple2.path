@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.9081054131054134,
-        "y": 5.456225071225072
+        "x": 3.056,
+        "y": 5.413
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2284757834757836,
-        "y": 7.756025641025641
+        "x": 1.3763703703703702,
+        "y": 7.712800569800569
       },
       "isLocked": false,
       "linkedName": null
@@ -96,12 +96,12 @@
     },
     {
       "anchor": {
-        "x": 2.9004564907275316,
-        "y": 5.438844507845934
+        "x": 3.056,
+        "y": 5.413
       },
       "prevControl": {
-        "x": 3.1462819712953785,
-        "y": 5.393349089355855
+        "x": 3.301825480567847,
+        "y": 5.367504581509921
       },
       "nextControl": null,
       "isLocked": false,
@@ -150,7 +150,26 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "Intake Start",
+      "waypointRelativePos": 0.6700682003257326,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Flywheel Start Distance",
+      "waypointRelativePos": 5.253053745928339,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "Intake Stop",
+      "waypointRelativePos": 5.740660627035837,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
@@ -161,13 +180,13 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 180.0
+    "rotation": -43.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "To Neutral",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": -31.0
+    "rotation": -43.0
   },
   "useDefaultConstraints": true
 }

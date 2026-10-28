@@ -200,13 +200,19 @@ public class SuperSystem implements Reportable {
     public Command autoShootWithDistance() {
         return Commands.run(
             () -> {
+                shooterState = ShooterState.SHOOTING;
                 // calculate distance
                 double distance = getHubDistance();
                 double rps = 0.0;
-                // convert to rps
-                rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
+                if (useHoodShoot()) {
+                    // convert to rps
+                    rps = ShooterConstants.kShootWithDistanceHoodA * distance * distance + ShooterConstants.kShootWithDistanceHoodB;
+                } else {
+                    // convert to rps
+                    rps = ShooterConstants.kShootWithDistanceA * distance * distance + ShooterConstants.kShootWithDistanceB;
+                }
                 // spin up flywheel
-                shooter.setDesiredValue(Math.min(55.0, rps));
+                shooter.setDesiredValue(Math.min(55.0, Math.max(0.0, rps)));
             }, shooter);
     }
 

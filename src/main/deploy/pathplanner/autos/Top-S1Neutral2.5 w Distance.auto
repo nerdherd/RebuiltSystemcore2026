@@ -13,68 +13,6 @@
                 "data": {
                   "pathName": "Copy of S1MidTriple1"
                 }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Down Only"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.225
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Hold"
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Start"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 4.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Flywheel Start Distance"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Stop"
-                      }
-                    }
-                  ]
-                }
               }
             ]
           }
@@ -96,7 +34,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.2
                       }
                     },
                     {
@@ -108,7 +46,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.3
+                        "waitTime": 2.7
                       }
                     },
                     {
@@ -138,49 +76,6 @@
                 "data": {
                   "pathName": "Copy of H45MidTriple2"
                 }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Start"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 2.25
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Flywheel Start Distance"
-                      }
-                    },
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Stop"
-                      }
-                    }
-                  ]
-                }
               }
             ]
           }
@@ -202,7 +97,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 0.8
+                        "waitTime": 0.2
                       }
                     },
                     {
@@ -214,7 +109,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.3
+                        "waitTime": 2.8
                       }
                     },
                     {
@@ -244,25 +139,6 @@
                 "data": {
                   "pathName": "Copy of TopH45Intake"
                 }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Intake Start"
-                      }
-                    }
-                  ]
-                }
               }
             ]
           }
@@ -271,6 +147,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "To Use",
   "choreoAuto": false
 }

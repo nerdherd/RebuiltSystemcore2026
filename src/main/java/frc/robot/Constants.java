@@ -403,8 +403,8 @@ public final class Constants {
         .withKP(0.15)
         .withKI(0.0)
         .withKD(0.0)
-        .withKV(0.118857)   //<- these are chezy values, these are yesterday's values -> 0.117051)
-        .withKS(0.222267);  //<- these are chezy values, these are yesterday's values -> 0.235819);
+        .withKV(0.118982)   //<- these are chezy values, these are yesterday's values -> 0.117051)
+        .withKS(0.203559);  //<- these are chezy values, these are yesterday's values -> 0.235819);
     
     private static final CurrentLimitsConfigs kCurrentLimitsConfigs = 
       new CurrentLimitsConfigs()

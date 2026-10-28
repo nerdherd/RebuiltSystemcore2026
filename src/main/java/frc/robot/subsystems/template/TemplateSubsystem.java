@@ -190,6 +190,7 @@ public class TemplateSubsystem extends SubsystemBase implements Reportable {
 		for (int i=0; i<5; i++) {
 			// NerdLog.reportInfo("Trying CANBus " + i);
 			motor = new TalonFX(id, new CANBus("can_s" + i));
+			motor.getVersion().refresh();
 			if(motor.isConnected()) {
 				return motor;
 			}

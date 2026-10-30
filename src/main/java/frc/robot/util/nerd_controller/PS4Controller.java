@@ -31,10 +31,10 @@ public class PS4Controller {
 
     // ***** BUTTON METHODS ***** //
 
-    public Trigger triggerLeft()        { return gamepad.L1();                   }
-    public Trigger triggerRight()       { return gamepad.R1();                   }
-    public Trigger bumperLeft()         { return gamepad.L2();                   }
-    public Trigger bumperRight()        { return gamepad.R2();                   }
+    public Trigger triggerLeft()        { return gamepad.L2();                   }
+    public Trigger triggerRight()       { return gamepad.R2();                   }
+    public Trigger bumperLeft()         { return gamepad.L1();                   }
+    public Trigger bumperRight()        { return gamepad.R1();                   }
     public Trigger buttonUp()           { return gamepad.triangle();             }
     public Trigger buttonRight()        { return gamepad.circle();               }
     public Trigger buttonDown()         { return gamepad.cross();                }

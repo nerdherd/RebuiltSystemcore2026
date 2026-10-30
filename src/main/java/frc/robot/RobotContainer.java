@@ -32,7 +32,7 @@ import frc.robot.commands.autos.Autos;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.NerdDrivetrain;
 import frc.robot.subsystems.SuperSystem;
-import frc.robot.util.nerd_controller.Controller;
+import frc.robot.util.nerd_controller.PS4Controller;
 import frc.robot.util.nerd_logging.NerdLog;
 import frc.robot.util.nerd_logging.Reportable.LOG_LEVEL;
 
@@ -43,9 +43,9 @@ public class RobotContainer {
   
   public SuperSystem superSystem;
 
-  private final Controller driverController = new Controller(ControllerConstants.kDriverControllerPort);
-  private final Controller operatorController = new Controller(ControllerConstants.kOperatorControllerPort);
-  private final Controller testController = new Controller(ControllerConstants.kTestControllerPort);
+  private final PS4Controller driverController = new PS4Controller(ControllerConstants.kDriverControllerPort);
+  private final PS4Controller operatorController = new PS4Controller(ControllerConstants.kOperatorControllerPort);
+  private final PS4Controller testController = new PS4Controller(ControllerConstants.kTestControllerPort);
   
   private static boolean isRedSide = false;
   
@@ -217,7 +217,7 @@ public class RobotContainer {
   }
 
   public void configureBindings_test() {
-    Controller.configureDebugBindings(testController);
+    PS4Controller.configureDebugBindings(testController);
   }
 
   public Tunable<String> printLog = null;
